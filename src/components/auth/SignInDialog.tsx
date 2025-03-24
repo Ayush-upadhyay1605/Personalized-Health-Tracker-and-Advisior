@@ -1,11 +1,14 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import ForgotPasswordDialog from './ForgotPasswordDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from "@/hooks/use-toast";
 
 interface SignInDialogProps {
   isOpen: boolean;
@@ -18,12 +21,41 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp }: SignInDialogProps) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle sign in logic here
-    console.log('Sign in with:', email, password);
-    onClose();
+    setIsLoading(true);
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Successfully signed in",
+        description: "Welcome back to HealthHub!",
+      });
+      
+      onClose();
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "Sign in failed",
+        description: error.message || "Please check your credentials and try again.",
+        variant: "destructive",
+      });
+      console.error("Sign in error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -93,8 +125,12 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp }: SignInDialogProps) => {
               </div>
             </div>
             
-            <Button type="submit" className="w-full bg-health-primary hover:bg-health-primary/90">
-              Sign In
+            <Button 
+              type="submit" 
+              className="w-full bg-health-primary hover:bg-health-primary/90"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing in..." : "Sign In"}
             </Button>
             
             <div className="text-center text-sm">

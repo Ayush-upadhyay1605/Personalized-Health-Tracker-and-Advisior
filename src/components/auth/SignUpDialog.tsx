@@ -1,10 +1,13 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from "@/hooks/use-toast";
 
 interface SignUpDialogProps {
   isOpen: boolean;
@@ -17,12 +20,46 @@ const SignUpDialog = ({ isOpen, onClose, onOpenSignIn }: SignUpDialogProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle sign up logic here
-    console.log('Sign up with:', fullName, email, password);
-    onClose();
+    setIsLoading(true);
+    
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
+        },
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Account created successfully",
+        description: "Welcome to HealthHub! Please check your email to verify your account.",
+      });
+      
+      onClose();
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "Sign up failed",
+        description: error.message || "An error occurred during sign up. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Sign up error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -80,6 +117,7 @@ const SignUpDialog = ({ isOpen, onClose, onOpenSignIn }: SignUpDialogProps) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={8}
               />
               <button
                 type="button"
@@ -102,8 +140,12 @@ const SignUpDialog = ({ isOpen, onClose, onOpenSignIn }: SignUpDialogProps) => {
             <a href="/privacy" className="text-health-primary hover:underline">Privacy Policy</a>.
           </div>
           
-          <Button type="submit" className="w-full bg-health-primary hover:bg-health-primary/90">
-            Create Account
+          <Button 
+            type="submit" 
+            className="w-full bg-health-primary hover:bg-health-primary/90"
+            disabled={isLoading}
+          >
+            {isLoading ? "Creating Account..." : "Create Account"}
           </Button>
           
           <div className="text-center text-sm">
