@@ -7,11 +7,13 @@ import Footer from '../components/Footer';
 import FeatureCard from '../components/features/FeatureCard';
 import FeatureItem from '../components/features/FeatureItem';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   // Check if user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleDashboardClick = async () => {
     const { data } = await supabase.auth.getSession();
@@ -20,6 +22,11 @@ const Index = () => {
     } else {
       // Handle not logged in state
       console.log('User is not logged in');
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to view your dashboard",
+        variant: "destructive",
+      });
     }
   };
 
