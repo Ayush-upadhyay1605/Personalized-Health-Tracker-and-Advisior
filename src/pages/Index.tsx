@@ -1,14 +1,27 @@
 
 import { useState } from 'react';
 import { Calendar, Activity, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import FeatureCard from '../components/features/FeatureCard';
 import FeatureItem from '../components/features/FeatureItem';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
-  // This would typically come from a user auth context
+  // Check if user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  const handleDashboardClick = async () => {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      navigate('/dashboard');
+    } else {
+      // Handle not logged in state
+      console.log('User is not logged in');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-health-light">
@@ -37,7 +50,7 @@ const Index = () => {
             description="Find and schedule appointments with trusted healthcare providers in your area"
             buttonText="Find Doctors"
             buttonColor="bg-health-primary hover:bg-health-primary/90"
-            onButtonClick={() => console.log('Find doctors clicked')}
+            onButtonClick={() => navigate('/appointments')}
           />
           
           <FeatureCard
@@ -50,7 +63,7 @@ const Index = () => {
             description="Monitor your daily activities, heart rate, and other vital health metrics"
             buttonText="View Dashboard"
             buttonColor="bg-health-secondary hover:bg-health-secondary/90"
-            onButtonClick={() => console.log('View dashboard clicked')}
+            onButtonClick={handleDashboardClick}
           />
         </div>
       </section>
@@ -92,7 +105,7 @@ const Index = () => {
           </p>
           <button 
             className="bg-health-primary text-white py-3 px-8 rounded-lg hover:bg-health-primary/90 transition-all duration-300 shadow-sm hover:shadow"
-            onClick={() => console.log('Get started clicked')}
+            onClick={handleDashboardClick}
           >
             Get Started Today
           </button>

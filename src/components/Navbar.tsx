@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import SignInDialog from './auth/SignInDialog';
 import SignUpDialog from './auth/SignUpDialog';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +13,7 @@ const Navbar = () => {
   const [isSignUpOpen, setIsSignUpOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Set up auth state listener
@@ -60,6 +61,18 @@ const Navbar = () => {
     }
   };
 
+  const handleViewDashboard = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      setIsSignInOpen(true);
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to view your dashboard.",
+      });
+    }
+  };
+
   return (
     <>
       <nav className="w-full py-4 px-6 md:px-12 flex justify-between items-center bg-transparent animate-fade-in">
@@ -73,6 +86,13 @@ const Navbar = () => {
               <span className="text-gray-700">
                 Hello, {user.user_metadata.full_name || user.email}
               </span>
+              <Button 
+                onClick={handleViewDashboard}
+                variant="default"
+                className="bg-health-primary text-white hover:bg-health-primary/90"
+              >
+                View Dashboard
+              </Button>
               <Button 
                 onClick={handleSignOut}
                 variant="outline"
