@@ -23,6 +23,12 @@ const Index = () => {
     }
   };
 
+  const handleFindDoctorsClick = () => {
+    // This button now leads to the appointments page directly
+    // without accessing the full dashboard
+    navigate('/appointments');
+  };
+
   return (
     <div className="min-h-screen bg-health-light">
       <Navbar />
@@ -50,7 +56,7 @@ const Index = () => {
             description="Find and schedule appointments with trusted healthcare providers in your area"
             buttonText="Find Doctors"
             buttonColor="bg-health-primary hover:bg-health-primary/90"
-            onButtonClick={() => navigate('/appointments')}
+            onButtonClick={handleFindDoctorsClick}
           />
           
           <FeatureCard
