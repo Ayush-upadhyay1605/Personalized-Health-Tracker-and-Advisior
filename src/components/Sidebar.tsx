@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Heart, Activity, Pill, Calendar, User, Settings } from 'lucide-react';
+import { Heart, Activity, Pill, User, Settings } from 'lucide-react';
 
 const Sidebar = () => {
   const location = useLocation();
@@ -15,7 +15,6 @@ const Sidebar = () => {
     { icon: Activity, label: 'Dashboard', path: '/dashboard' },
     { icon: Heart, label: 'Health Metrics', path: '/metrics' },
     { icon: Pill, label: 'Medications', path: '/medications' },
-    { icon: Calendar, label: 'Appointments', path: '/appointments' },
     { icon: User, label: 'Profile', path: '/profile' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];
