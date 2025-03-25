@@ -48,7 +48,7 @@ We welcome contributions! Please follow these steps to contribute:
 4. Commit your changes (`git commit -m 'Add new feature'`)
 5. Push to the branch (`git push origin feature-branch`)
 6. Create a new Pull Request
-7. 
+
 ## Contact
 If you have any questions or feedback, please feel free to reach out to the project maintainer, Ayush Upadhyay, at work.uayush16@gmail.com.
 
