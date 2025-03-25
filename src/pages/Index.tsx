@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Calendar, Activity, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -31,8 +30,7 @@ const Index = () => {
   };
 
   const handleFindDoctorsClick = () => {
-    // This button now leads to the appointments page directly
-    // without accessing the full dashboard
+    // This button simply navigates to the appointments page
     navigate('/appointments');
   };
 
