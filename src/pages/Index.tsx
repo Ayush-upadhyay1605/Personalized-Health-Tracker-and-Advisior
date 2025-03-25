@@ -30,7 +30,6 @@ const Index = () => {
   };
 
   const handleFindDoctorsClick = () => {
-    // This button simply navigates to the appointments page
     navigate('/appointments');
   };
 
