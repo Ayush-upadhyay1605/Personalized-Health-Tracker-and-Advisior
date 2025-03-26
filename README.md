@@ -5,11 +5,11 @@
 
 LIVE URL : https://personalized-health-tracker-and-advisior.vercel.app/
 
-## Features
-- **Health Tracking**: Monitor various health metrics such as activity levels, sleep patterns, and dietary habits.
-- **Personalized Recommendations**: Receive tailored advice based on your health data to improve your well-being.
-- **Data Visualization**: Understand your health trends through intuitive graphs and charts.
-- **Integration**: Sync with wearable devices and other health apps to gather comprehensive health data.
+## 🎯 Key Features  
+✅ **Health Tracking** – Monitor heart rate, steps, sleep, calories, sugar levels, and more.  
+✅ **Personalized Recommendations** – AI-driven health advice tailored to your health data.  
+✅ **Data Visualization** – Track progress with easy-to-read graphs and charts.  
+✅ **Device Integration** – Sync with wearables and other fitness apps for accurate tracking.  
 
 ## Technologies Used
 - **TypeScript**: The primary programming language used for the development of the application.
