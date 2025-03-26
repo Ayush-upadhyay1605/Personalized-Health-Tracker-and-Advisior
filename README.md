@@ -1,7 +1,7 @@
 # 🚀 Personalized Health Tracker & Advisor  
 
-## Overview
-Personalized Health Tracker and Advisor is a comprehensive application designed to help users monitor and improve their health. The application leverages advanced data analytics to provide personalized health insights and recommendations.
+## 📖 Overview  
+**Personalized Health Tracker & Advisor** is a smart health application that helps users track their health and get personalized insights to improve their well-being. With **real-time data analytics**, users receive tailored recommendations based on their health metrics.  
 
 LIVE URL : https://personalized-health-tracker-and-advisior.vercel.app/
 
