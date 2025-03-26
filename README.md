@@ -11,10 +11,13 @@ LIVE URL : https://personalized-health-tracker-and-advisior.vercel.app/
 ✅ **Data Visualization** – Track progress with easy-to-read graphs and charts.  
 ✅ **Device Integration** – Sync with wearables and other fitness apps for accurate tracking.  
 
-## Technologies Used
-- **TypeScript**: The primary programming language used for the development of the application.
-- **CSS**: Used for styling the user interface.
-- **Other**: Additional technologies and libraries used in the project.
+# 🛠 Tech Stack  
+| Technology | Description |
+|------------|------------|
+| **TypeScript** | Main programming language for development |
+| **CSS** | Used for UI styling and responsiveness |
+| **Supabase** | Authentication & database management |
+| **Other Libraries** | Additional technologies for smooth app performance |
 
 ## Installation
 To run this project locally, follow these steps:
