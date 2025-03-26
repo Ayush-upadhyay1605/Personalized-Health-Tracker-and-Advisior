@@ -19,8 +19,9 @@ LIVE URL : https://personalized-health-tracker-and-advisior.vercel.app/
 | **Supabase** | Authentication & database management |
 | **Other Libraries** | Additional technologies for smooth app performance |
 
-## Installation
-To run this project locally, follow these steps:
+## ⚡ Installation & Setup  
+
+Follow these simple steps to run the project on your local machine:
 
 1. **Clone the repository**
     ```bash
