@@ -1,4 +1,5 @@
 
+import React from "react"; // Explicitly import React
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,58 +17,68 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import DashboardLayout from "./components/DashboardLayout";
 
-const queryClient = new QueryClient();
+// Create a new QueryClient instance outside of component render
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          
-          {/* Doctor Search and Booking Routes */}
-          <Route path="/doctor-search" element={<DoctorSearch />} />
-          <Route path="/book-appointment" element={<BookAppointment />} />
-          
-          {/* Dashboard Routes */}
-          <Route path="/dashboard" element={
-            <DashboardLayout>
-              <Dashboard />
-            </DashboardLayout>
-          } />
-          <Route path="/metrics" element={
-            <DashboardLayout>
-              <HealthMetrics />
-            </DashboardLayout>
-          } />
-          <Route path="/medications" element={
-            <DashboardLayout>
-              <Medications />
-            </DashboardLayout>
-          } />
-          <Route path="/appointments" element={
-            <DashboardLayout>
-              <Appointments />
-            </DashboardLayout>
-          } />
-          <Route path="/profile" element={
-            <DashboardLayout>
-              <Profile />
-            </DashboardLayout>
-          } />
-          <Route path="/settings" element={
-            <DashboardLayout>
-              <Settings />
-            </DashboardLayout>
-          } />
-          
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            
+            {/* Doctor Search and Booking Routes */}
+            <Route path="/doctor-search" element={<DoctorSearch />} />
+            <Route path="/book-appointment" element={<BookAppointment />} />
+            
+            {/* Dashboard Routes */}
+            <Route path="/dashboard" element={
+              <DashboardLayout>
+                <Dashboard />
+              </DashboardLayout>
+            } />
+            <Route path="/metrics" element={
+              <DashboardLayout>
+                <HealthMetrics />
+              </DashboardLayout>
+            } />
+            <Route path="/medications" element={
+              <DashboardLayout>
+                <Medications />
+              </DashboardLayout>
+            } />
+            <Route path="/appointments" element={
+              <DashboardLayout>
+                <Appointments />
+              </DashboardLayout>
+            } />
+            <Route path="/profile" element={
+              <DashboardLayout>
+                <Profile />
+              </DashboardLayout>
+            } />
+            <Route path="/settings" element={
+              <DashboardLayout>
+                <Settings />
+              </DashboardLayout>
+            } />
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;
