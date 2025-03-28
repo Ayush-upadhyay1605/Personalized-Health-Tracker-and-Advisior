@@ -54,5 +54,5 @@ We welcome contributions! Please follow these steps to contribute:
 6. Create a new Pull Request
 
 ## Contact
-If you have any questions or feedback, please feel free to reach out to the project maintainer, Ayush Upadhyay, at work.uayush16@gmail.com.
+If you have any questions or feedback, please feel free to reach out to the project maintainer, Ayush Upadhyay, at work.uayush16@gmail.com
 
