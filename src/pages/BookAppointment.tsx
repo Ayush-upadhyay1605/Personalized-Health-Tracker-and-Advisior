@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfDay } from 'date-fns';
@@ -8,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import DoctorVideoCall from '@/components/DoctorVideoCall';
+import DoctorChat from '@/components/DoctorChat';
 
 const BookAppointment = () => {
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ const BookAppointment = () => {
   const [selectedTime, setSelectedTime] = useState(null);
   const [consultationType, setConsultationType] = useState('in-person');
   const [isLoading, setIsLoading] = useState(false);
+  const [isVideoCallOpen, setIsVideoCallOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     // Retrieve selected doctor from localStorage
@@ -129,6 +132,38 @@ const BookAppointment = () => {
     }
   };
 
+  const handleVideoCall = () => {
+    // Check if user is logged in
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to start a video call",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setIsVideoCallOpen(true);
+    });
+  };
+
+  const handleChat = () => {
+    // Check if user is logged in
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to chat with the doctor",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setIsChatOpen(true);
+    });
+  };
+
   if (!doctor) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -212,6 +247,13 @@ const BookAppointment = () => {
                           <span>20 min</span>
                         </div>
                       </div>
+                      <Button 
+                        className="w-full mt-4 bg-health-primary hover:bg-health-primary/90"
+                        onClick={handleVideoCall}
+                      >
+                        <Video className="h-4 w-4 mr-2" />
+                        Start Video Call Now
+                      </Button>
                     </TabsContent>
                     <TabsContent value="chat" className="mt-4">
                       <div className="flex justify-between items-center">
@@ -224,6 +266,13 @@ const BookAppointment = () => {
                           <span>24 hours</span>
                         </div>
                       </div>
+                      <Button 
+                        className="w-full mt-4 bg-health-primary hover:bg-health-primary/90"
+                        onClick={handleChat}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Start Chat Now
+                      </Button>
                     </TabsContent>
                   </Tabs>
                 </div>
@@ -302,6 +351,22 @@ const BookAppointment = () => {
           </div>
         </div>
       </main>
+
+      {/* Video Call Dialog */}
+      <DoctorVideoCall 
+        doctorName={doctor.name}
+        doctorImage={doctor.image}
+        open={isVideoCallOpen}
+        onOpenChange={setIsVideoCallOpen}
+      />
+
+      {/* Chat Drawer */}
+      <DoctorChat 
+        doctorName={doctor.name}
+        doctorImage={doctor.image}
+        open={isChatOpen}
+        onOpenChange={setIsChatOpen}
+      />
     </div>
   );
 };

@@ -1,18 +1,22 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Calendar, Star, Filter, Clock } from 'lucide-react';
+import { Search, MapPin, Calendar, Star, Filter, Clock, Video, MessageSquare } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import DoctorVideoCall from '@/components/DoctorVideoCall';
+import DoctorChat from '@/components/DoctorChat';
 
 const DoctorSearch = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('All');
+  const [isVideoCallOpen, setIsVideoCallOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
 
   // Mock data for doctors
   const doctors = [
@@ -21,7 +25,7 @@ const DoctorSearch = () => {
       name: 'Dr. Sarah Johnson',
       specialty: 'Cardiologist',
       experience: '15 years',
-      location: 'Central Hospital, New York',
+      location: "Central Hospital, New York",
       rating: 4.8,
       reviews: 127,
       fee: '$150',
@@ -50,7 +54,7 @@ const DoctorSearch = () => {
       reviews: 156,
       fee: '$130',
       availableToday: false,
-      image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+      image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
     },
     {
       id: 4,
@@ -114,9 +118,42 @@ const DoctorSearch = () => {
     navigate('/book-appointment');
   };
 
+  const handleVideoCall = (doctor) => {
+    // Check if user is logged in
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to start a video call",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setSelectedDoctor(doctor);
+      setIsVideoCallOpen(true);
+    });
+  };
+
+  const handleChat = (doctor) => {
+    // Check if user is logged in
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to chat with the doctor",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setSelectedDoctor(doctor);
+      setIsChatOpen(true);
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header with Search */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
@@ -146,7 +183,6 @@ const DoctorSearch = () => {
 
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row gap-6">
-          {/* Filters Sidebar */}
           <div className="w-full md:w-64 bg-white p-4 rounded-lg shadow-sm">
             <div className="flex items-center gap-2 mb-4">
               <Filter className="h-5 w-5 text-gray-500" />
@@ -211,7 +247,6 @@ const DoctorSearch = () => {
             </div>
           </div>
 
-          {/* Doctor Listings */}
           <div className="flex-1">
             <Tabs defaultValue="all">
               <TabsList className="mb-4">
@@ -336,15 +371,23 @@ const DoctorSearch = () => {
                                   <span className="text-lg font-medium text-gray-900">${parseInt(doctor.fee.substring(1)) - 30}</span>
                                   <span className="text-sm text-gray-500 ml-1">video consultation</span>
                                 </div>
-                                <Button 
-                                  variant="outline"
-                                  className="border-health-primary text-health-primary hover:bg-health-primary/10 mr-2"
-                                >
-                                  Chat Now
-                                </Button>
-                                <Button className="bg-health-primary hover:bg-health-primary/90">
-                                  Video Call
-                                </Button>
+                                <div className="flex gap-2">
+                                  <Button 
+                                    variant="outline"
+                                    className="border-health-primary text-health-primary hover:bg-health-primary/10"
+                                    onClick={() => handleChat(doctor)}
+                                  >
+                                    <MessageSquare className="h-4 w-4 mr-1" />
+                                    Chat Now
+                                  </Button>
+                                  <Button 
+                                    className="bg-health-primary hover:bg-health-primary/90"
+                                    onClick={() => handleVideoCall(doctor)}
+                                  >
+                                    <Video className="h-4 w-4 mr-1" />
+                                    Video Call
+                                  </Button>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -357,6 +400,24 @@ const DoctorSearch = () => {
           </div>
         </div>
       </main>
+
+      {selectedDoctor && (
+        <DoctorVideoCall 
+          doctorName={selectedDoctor.name}
+          doctorImage={selectedDoctor.image}
+          open={isVideoCallOpen}
+          onOpenChange={setIsVideoCallOpen}
+        />
+      )}
+
+      {selectedDoctor && (
+        <DoctorChat 
+          doctorName={selectedDoctor.name}
+          doctorImage={selectedDoctor.image}
+          open={isChatOpen}
+          onOpenChange={setIsChatOpen}
+        />
+      )}
     </div>
   );
 };
