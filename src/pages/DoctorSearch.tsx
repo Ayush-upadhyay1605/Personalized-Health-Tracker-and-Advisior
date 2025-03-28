@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -17,8 +16,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-// Google Maps libraries to load
-const libraries = ['places'];
+// Define libraries as proper type for Google Maps
+const libraries = ['places'] as google.maps.Libraries;
 
 // Map container style
 const mapContainerStyle = {
