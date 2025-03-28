@@ -1,7 +1,8 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfDay } from 'date-fns';
-import { Calendar, ChevronLeft, ChevronRight, Clock, MapPin, Video, MessageSquare } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Clock, MapPin, Video, MessageSquare, CreditCard } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -9,6 +10,9 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import DoctorVideoCall from '@/components/DoctorVideoCall';
 import DoctorChat from '@/components/DoctorChat';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+import { loadRazorpay } from '@/utils/razorpay';
 
 const BookAppointment = () => {
   const navigate = useNavigate();
@@ -18,8 +22,10 @@ const BookAppointment = () => {
   const [selectedTime, setSelectedTime] = useState(null);
   const [consultationType, setConsultationType] = useState('in-person');
   const [isLoading, setIsLoading] = useState(false);
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
   const [isVideoCallOpen, setIsVideoCallOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
 
   useEffect(() => {
     // Retrieve selected doctor from localStorage
@@ -76,8 +82,13 @@ const BookAppointment = () => {
       return;
     }
 
-    setIsLoading(true);
+    // Open payment dialog
+    setIsPaymentDialogOpen(true);
+  };
 
+  const handlePayment = async (paymentMethod) => {
+    setIsPaymentLoading(true);
+    
     try {
       // Format date string for database
       const appointmentDate = new Date(selectedDate);
@@ -90,34 +101,103 @@ const BookAppointment = () => {
       
       appointmentDate.setHours(hour, parseInt(minutes));
 
-      // Insert appointment into database
-      const { error } = await supabase.from('appointments').insert({
-        user_id: data.session.user.id,
-        doctor_name: doctor.name, 
-        appointment_date: appointmentDate.toISOString(),
-        hospital: doctor.location,
-        status: 'scheduled'
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Appointment booked!",
-        description: `Your appointment with ${doctor.name} has been scheduled`,
-      });
-
-      // Redirect to appointments page
-      navigate('/appointments');
+      // Get fee amount from doctor data
+      const feeAmount = parseInt(doctor.fee.replace(/[^0-9]/g, ''));
+      
+      if (paymentMethod === 'razorpay') {
+        await processRazorpayPayment(feeAmount, appointmentDate);
+      } else {
+        // For demo purposes, just proceed with booking for other payment methods
+        await finalizeBooking(appointmentDate);
+      }
     } catch (error) {
-      console.error('Error booking appointment:', error);
+      console.error('Error during payment:', error);
       toast({
-        title: "Failed to book appointment",
+        title: "Payment failed",
         description: error.message || "An unexpected error occurred",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
+      setIsPaymentLoading(false);
     }
+  };
+
+  const processRazorpayPayment = async (amount, appointmentDate) => {
+    try {
+      // Load Razorpay
+      const razorpay = await loadRazorpay();
+      
+      // Get user data
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session.user;
+      
+      // Create Razorpay order options
+      const options = {
+        key: 'rzp_test_YourTestKey', // Replace with your actual Razorpay key
+        amount: amount * 100, // Amount in smallest currency unit (paise for INR)
+        currency: 'INR',
+        name: 'HealthConnect',
+        description: `Appointment with ${doctor.name}`,
+        image: '/favicon.ico',
+        prefill: {
+          email: user.email,
+          contact: '', // Would need to be fetched from user profile if available
+        },
+        theme: {
+          color: '#3399cc'
+        },
+        handler: async function(response) {
+          // Handle successful payment
+          console.log('Payment successful:', response);
+          
+          // Finalize booking after successful payment
+          await finalizeBooking(appointmentDate, response.razorpay_payment_id);
+        },
+        modal: {
+          ondismiss: function() {
+            setIsPaymentLoading(false);
+            setIsPaymentDialogOpen(false);
+          }
+        }
+      };
+      
+      // Initialize and open Razorpay payment form
+      const paymentObject = new razorpay(options);
+      paymentObject.open();
+      
+    } catch (error) {
+      console.error('Razorpay payment error:', error);
+      throw new Error('Failed to initialize payment gateway');
+    }
+  };
+
+  const finalizeBooking = async (appointmentDate, paymentId = null) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    // Insert appointment into database
+    const { error } = await supabase.from('appointments').insert({
+      user_id: session.user.id,
+      doctor_name: doctor.name, 
+      appointment_date: appointmentDate.toISOString(),
+      hospital: doctor.location,
+      status: 'scheduled',
+      payment_status: paymentId ? 'paid' : 'pending',
+      payment_id: paymentId,
+      consultation_type: consultationType,
+      fee_amount: parseInt(doctor.fee.replace(/[^0-9]/g, ''))
+    });
+
+    if (error) throw error;
+
+    toast({
+      title: "Appointment booked!",
+      description: `Your appointment with ${doctor.name} has been scheduled`,
+    });
+
+    setIsPaymentLoading(false);
+    setIsPaymentDialogOpen(false);
+    
+    // Redirect to appointments page
+    navigate('/appointments');
   };
 
   const nextDay = () => {
@@ -335,11 +415,12 @@ const BookAppointment = () => {
                 {/* Booking Button */}
                 <div className="mt-8">
                   <Button 
-                    className="w-full bg-health-primary hover:bg-health-primary/90"
+                    className="w-full bg-health-primary hover:bg-health-primary/90 flex items-center justify-center gap-2"
                     onClick={handleBookAppointment}
                     disabled={!selectedTime || isLoading}
                   >
-                    {isLoading ? "Booking..." : `Book ${consultationType === 'in-person' ? 'Appointment' : consultationType === 'video' ? 'Video Call' : 'Chat Consultation'}`}
+                    {isLoading ? "Booking..." : "Proceed to Payment"}
+                    <CreditCard className="h-4 w-4" />
                   </Button>
                   
                   <p className="text-xs text-gray-500 text-center mt-2">
@@ -351,6 +432,84 @@ const BookAppointment = () => {
           </div>
         </div>
       </main>
+
+      {/* Payment Dialog */}
+      <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Payment Options</DialogTitle>
+            <DialogDescription>
+              Select a payment method to complete your booking
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="rounded-lg border p-4">
+              <h3 className="font-medium text-lg mb-2">Appointment Summary</h3>
+              <div className="space-y-1 text-sm">
+                <p><span className="text-gray-500">Doctor:</span> {doctor.name}</p>
+                <p><span className="text-gray-500">Date:</span> {format(selectedDate, 'MMMM d, yyyy')}</p>
+                <p><span className="text-gray-500">Time:</span> {selectedTime?.time}</p>
+                <p><span className="text-gray-500">Type:</span> {consultationType === 'in-person' ? 'In-Person Visit' : consultationType === 'video' ? 'Video Consultation' : 'Chat Consultation'}</p>
+              </div>
+              
+              <Separator className="my-3" />
+              
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Total Amount</span>
+                <span className="font-bold text-lg">
+                  {consultationType === 'in-person' 
+                    ? doctor.fee 
+                    : consultationType === 'video' 
+                      ? `$${parseInt(doctor.fee.substring(1)) - 30}` 
+                      : `$${parseInt(doctor.fee.substring(1)) - 50}`}
+                </span>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <h3 className="font-medium">Select Payment Method</h3>
+              
+              <div 
+                className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
+                onClick={() => handlePayment('razorpay')}
+              >
+                <div className="h-10 w-10 flex items-center justify-center bg-blue-50 rounded-full mr-3">
+                  <CreditCard className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Razorpay</p>
+                  <p className="text-xs text-gray-500">Credit/Debit Card, UPI, Netbanking, Wallet</p>
+                </div>
+              </div>
+              
+              <div 
+                className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
+                onClick={() => handlePayment('cash')}
+              >
+                <div className="h-10 w-10 flex items-center justify-center bg-green-50 rounded-full mr-3">
+                  <CreditCard className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Pay at Clinic</p>
+                  <p className="text-xs text-gray-500">Cash, Card, or UPI accepted at the clinic</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex-col sm:flex-row sm:justify-between sm:space-x-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsPaymentDialogOpen(false)}
+              disabled={isPaymentLoading}
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Video Call Dialog */}
       <DoctorVideoCall 
