@@ -30,7 +30,7 @@ const Index = () => {
   };
 
   const handleFindDoctorsClick = () => {
-    navigate('/appointments');
+    navigate('/doctor-search');
   };
 
   return (

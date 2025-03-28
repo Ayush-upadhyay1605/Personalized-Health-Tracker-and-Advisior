@@ -10,6 +10,8 @@ import Dashboard from "./pages/Dashboard";
 import HealthMetrics from "./pages/HealthMetrics";
 import Medications from "./pages/Medications";
 import Appointments from "./pages/Appointments";
+import DoctorSearch from "./pages/DoctorSearch";
+import BookAppointment from "./pages/BookAppointment";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import DashboardLayout from "./components/DashboardLayout";
@@ -24,6 +26,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          
+          {/* Doctor Search and Booking Routes */}
+          <Route path="/doctor-search" element={<DoctorSearch />} />
+          <Route path="/book-appointment" element={<BookAppointment />} />
           
           {/* Dashboard Routes */}
           <Route path="/dashboard" element={
