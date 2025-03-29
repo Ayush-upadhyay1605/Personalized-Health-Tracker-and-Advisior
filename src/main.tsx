@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -28,7 +29,5 @@ if (import.meta.env.DEV && window.location.hostname === 'localhost') {
       },
       onUnhandledRequest: 'bypass',
     });
-  }).catch((error) => {
-    console.error("Failed to start MSW:", error);
   });
 }
