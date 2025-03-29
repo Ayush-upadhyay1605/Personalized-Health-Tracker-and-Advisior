@@ -1,28 +1,18 @@
 
-import { useState } from 'react';
+import { ReactNode } from 'react';
 import Sidebar from './Sidebar';
-import ChatbotDialog from './ChatbotDialog';
 
 interface DashboardLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-
-  const openChatbot = () => {
-    setIsChatbotOpen(true);
-  };
-
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar openChatbot={openChatbot} />
-      <main className="flex-1 p-6">
-        <div className="max-w-7xl mx-auto">
-          {children}
-        </div>
-      </main>
-      <ChatbotDialog open={isChatbotOpen} onOpenChange={setIsChatbotOpen} />
+      <Sidebar />
+      <div className="flex-1 overflow-auto">
+        <main className="p-6">{children}</main>
+      </div>
     </div>
   );
 };
