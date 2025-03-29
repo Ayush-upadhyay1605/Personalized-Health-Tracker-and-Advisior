@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { User, Phone, Mail, MapPin, Activity, AlertTriangle, Calendar, Shield } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,16 +15,15 @@ const Profile = () => {
     const fetchUserData = async () => {
       try {
         setLoading(true);
-        
+
         // Get the current session
-        const { data: sessionData } = await supabase.auth.getSession();
-        
-        if (!sessionData.session) {
-          return;
+        const { data: sessionData, error } = await supabase.auth.getSession();
+        if (error || !sessionData?.session) {
+          throw new Error('Session not found');
         }
-        
+
         const user = sessionData.session.user;
-        
+
         // Set the user profile with data from auth
         setUserProfile({
           id: user.id,
@@ -33,21 +31,21 @@ const Profile = () => {
           name: user.user_metadata?.full_name || 'Health Buddy User',
           phone: user.phone || user.user_metadata?.phone || '+1 (555) 123-4567',
           address: user.user_metadata?.address || '123 Health St, Medical City',
-          bloodType: 'A+', // This would ideally come from a user_metadata or profiles table
+          bloodType: user.user_metadata?.bloodType || 'A+',
           joinedDate: new Date(user.created_at).toLocaleDateString(),
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching user data:', error);
         toast({
           title: 'Error fetching profile',
-          description: 'We could not load your profile information',
+          description: error.message || 'We could not load your profile information',
           variant: 'destructive',
         });
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchUserData();
   }, [toast]);
   
