@@ -19,15 +19,13 @@ if (root) {
   console.error("Root element not found");
 }
 
-// Only load MSW in development, not for production builds
-// This prevents the service worker registration error during deployment
-if (import.meta.env.DEV && window.location.hostname === 'localhost') {
-  import('./mocks/browser').then(({ worker }) => {
-    worker.start({
-      serviceWorker: {
-        url: '/mockServiceWorker.js',
-      },
-      onUnhandledRequest: 'bypass',
-    });
+// Configure the Supabase API proxy for local development
+if (import.meta.env.DEV) {
+  const { worker } = await import('./mocks/browser');
+  worker.start({
+    serviceWorker: {
+      url: '/mockServiceWorker.js',
+    },
+    onUnhandledRequest: 'bypass',
   });
 }
