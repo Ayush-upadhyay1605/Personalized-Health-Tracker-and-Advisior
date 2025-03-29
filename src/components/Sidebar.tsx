@@ -1,32 +1,11 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Heart, Activity, Pill, User, Settings, Calendar } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 
 const Sidebar = () => {
   const location = useLocation();
   const [expanded] = useState(true);
-  const [user, setUser] = useState(null);
-
-  // Check for user session on component mount
-  useEffect(() => {
-    const getUser = async () => {
-      const { data } = await supabase.auth.getSession();
-      setUser(data.session?.user || null);
-    };
-    
-    getUser();
-    
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user || null);
-      }
-    );
-    
-    return () => subscription.unsubscribe();
-  }, []);
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -58,7 +37,7 @@ const Sidebar = () => {
                 to={item.path}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
                   isActive(item.path)
-                    ? 'text-health-primary font-medium bg-health-primary/10'
+                    ? 'text-health-primary font-medium'
                     : 'text-gray-700 hover:text-health-primary hover:bg-gray-50'
                 }`}
               >
@@ -69,25 +48,6 @@ const Sidebar = () => {
           ))}
         </ul>
       </nav>
-      
-      {user && (
-        <div className="p-4 border-t border-gray-200">
-          <Link 
-            to="/profile"
-            className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-50"
-          >
-            <div className="w-8 h-8 rounded-full bg-health-primary/10 flex items-center justify-center">
-              <User className="h-4 w-4 text-health-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">
-                {user.user_metadata?.full_name || user.email}
-              </p>
-              <p className="text-xs text-gray-500 truncate">View profile</p>
-            </div>
-          </Link>
-        </div>
-      )}
     </div>
   );
 };
