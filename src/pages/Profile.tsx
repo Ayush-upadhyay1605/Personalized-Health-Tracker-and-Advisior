@@ -1,8 +1,56 @@
 
-import { User, Phone, Mail, MapPin, Activity, AlertTriangle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { User, Phone, Mail, MapPin, Activity, AlertTriangle, Calendar, Shield } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 const Profile = () => {
+  const [userProfile, setUserProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  
+  // Fetch user data
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        
+        // Get the current session
+        const { data: sessionData } = await supabase.auth.getSession();
+        
+        if (!sessionData.session) {
+          return;
+        }
+        
+        const user = sessionData.session.user;
+        
+        // Set the user profile with data from auth
+        setUserProfile({
+          id: user.id,
+          email: user.email,
+          name: user.user_metadata?.full_name || 'Health Buddy User',
+          phone: user.phone || user.user_metadata?.phone || '+1 (555) 123-4567',
+          address: user.user_metadata?.address || '123 Health St, Medical City',
+          bloodType: 'A+', // This would ideally come from a user_metadata or profiles table
+          joinedDate: new Date(user.created_at).toLocaleDateString(),
+        });
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        toast({
+          title: 'Error fetching profile',
+          description: 'We could not load your profile information',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchUserData();
+  }, [toast]);
+  
   const medicalConditions = [
     {
       condition: 'Hypertension',
@@ -31,6 +79,21 @@ const Profile = () => {
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">Profile</h1>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex justify-center items-center h-32">
+              <p>Loading profile information...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Profile</h1>
@@ -43,8 +106,8 @@ const Profile = () => {
               <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center mb-3">
                 <User className="h-16 w-16 text-gray-400" />
               </div>
-              <h2 className="text-xl font-bold text-center">Ayush Upadhyay</h2>
-              <p className="text-muted-foreground text-center">Patient ID: #123456</p>
+              <h2 className="text-xl font-bold text-center">{userProfile?.name}</h2>
+              <p className="text-muted-foreground text-center">Patient ID: #{userProfile?.id.slice(0, 6)}</p>
             </div>
             
             <div className="md:w-3/4 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -52,7 +115,7 @@ const Profile = () => {
                 <Phone className="h-5 w-5 text-gray-500 mt-1" />
                 <div>
                   <p className="text-sm text-muted-foreground">Phone</p>
-                  <p className="font-medium">+1 (555) 123-4567</p>
+                  <p className="font-medium">{userProfile?.phone}</p>
                 </div>
               </div>
               
@@ -60,7 +123,7 @@ const Profile = () => {
                 <Mail className="h-5 w-5 text-gray-500 mt-1" />
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">john.doe@example.com</p>
+                  <p className="font-medium">{userProfile?.email}</p>
                 </div>
               </div>
               
@@ -68,7 +131,7 @@ const Profile = () => {
                 <MapPin className="h-5 w-5 text-gray-500 mt-1" />
                 <div>
                   <p className="text-sm text-muted-foreground">Address</p>
-                  <p className="font-medium">123 Health St, Medical City</p>
+                  <p className="font-medium">{userProfile?.address}</p>
                 </div>
               </div>
               
@@ -76,10 +139,32 @@ const Profile = () => {
                 <Activity className="h-5 w-5 text-gray-500 mt-1" />
                 <div>
                   <p className="text-sm text-muted-foreground">Blood Type</p>
-                  <p className="font-medium">A+</p>
+                  <p className="font-medium">{userProfile?.bloodType}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <Calendar className="h-5 w-5 text-gray-500 mt-1" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Joined</p>
+                  <p className="font-medium">{userProfile?.joinedDate}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <Shield className="h-5 w-5 text-gray-500 mt-1" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Account</p>
+                  <p className="font-medium">Health Buddy User</p>
                 </div>
               </div>
             </div>
+          </div>
+          
+          <div className="mt-6 flex justify-end">
+            <Button variant="outline" className="mr-2">
+              Edit Profile
+            </Button>
           </div>
         </CardContent>
       </Card>
