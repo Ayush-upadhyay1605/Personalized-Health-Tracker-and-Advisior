@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,12 @@ interface ChatMessage {
   role: 'user' | 'bot';
   content: string;
   timestamp: Date;
+}
+
+// Define interface for the API message format
+interface ApiChatMessage {
+  role: 'user' | 'model';
+  parts: { text: string }[];
 }
 
 interface ChatbotDialogProps {
@@ -51,8 +56,15 @@ const ChatbotDialog = ({ open, onOpenChange }: ChatbotDialogProps) => {
   }, [messages]);
   
   const handleSendMessage = async () => {
-    if (!input.trim()) return;
-    
+    if (!input.trim()) {
+      toast({
+        title: "Invalid Input",
+        description: "Please enter a valid message.",
+        variant: "warning",
+      });
+      return;
+    }
+  
     // Add user message
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -60,21 +72,21 @@ const ChatbotDialog = ({ open, onOpenChange }: ChatbotDialogProps) => {
       content: input.trim(),
       timestamp: new Date(),
     };
-    
-    setMessages(prev => [...prev, userMessage]);
+  
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
-    
+  
     try {
       // Format messages for the API request
-      const historyForApi = messages.map(msg => ({
+      const historyForApi: ApiChatMessage[] = messages.map((msg) => ({
         role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.content }]
+        parts: [{ text: msg.content }],
       }));
-
+  
       // Call the Gemini service
       const response = await sendChatMessage(input.trim(), historyForApi);
-      
+  
       // Add bot response
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -82,16 +94,16 @@ const ChatbotDialog = ({ open, onOpenChange }: ChatbotDialogProps) => {
         content: response,
         timestamp: new Date(),
       };
-      
-      setMessages(prev => [...prev, botMessage]);
-    } catch (error) {
+  
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (error: any) {
       console.error('Error calling Gemini API:', error);
       toast({
         title: "Error",
-        description: "Could not connect to the health assistant. Please try again.",
+        description: error.message || "Could not connect to the health assistant. Please try again.",
         variant: "destructive",
       });
-      
+  
       // Add error message from bot
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -99,8 +111,8 @@ const ChatbotDialog = ({ open, onOpenChange }: ChatbotDialogProps) => {
         content: "I'm having trouble connecting to my medical knowledge base. Could you please try again?",
         timestamp: new Date(),
       };
-      
-      setMessages(prev => [...prev, errorMessage]);
+  
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
       inputRef.current?.focus();

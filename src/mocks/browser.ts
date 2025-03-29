@@ -1,27 +1,29 @@
 
-import { http, HttpResponse, passthrough } from 'msw';
-import { setupWorker } from 'msw/browser';
+import { rest } from 'msw';
+import { setupWorker } from 'msw';
 
 // Create a request handler
 const handlers = [
-  http.post('/api/chat', async ({ request }) => {
+  rest.post('/api/chat', async (req, res, ctx) => {
     try {
       // Get the request body as text and then parse it
-      const text = await request.text();
+      const text = await req.text();
       const data = JSON.parse(text);
-      
+
       // Now we can safely access properties on the parsed object
-      return HttpResponse.json({
-        response: `This is a mock response for: ${data.message || 'No message provided'}`
-      });
+      return res(
+        ctx.json({
+          response: `This is a mock response for: ${data.message || 'No message provided'}`,
+        })
+      );
     } catch (error) {
-      return HttpResponse.json(
-        { error: 'Failed to process request' },
-        { status: 400 }
+      return res(
+        ctx.status(400),
+        ctx.json({ error: 'Failed to process request' })
       );
     }
   }),
-  
+
   // Add more handlers here
 ];
 
