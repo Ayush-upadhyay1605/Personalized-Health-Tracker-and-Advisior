@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -16,7 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-// Define libraries for Google Maps - fixing the type error
+// Define libraries for Google Maps - fixed type error
 import type { Libraries } from '@react-google-maps/api/dist/utils/make-load-script-url';
 const libraries: Libraries = ['places'];
 
@@ -32,3 +33,15 @@ const defaultCenter = {
   lat: 37.7749,
   lng: -122.4194
 };
+
+const DoctorSearch = () => {
+  // Component implementation goes here
+  return (
+    <div>
+      <h1>Doctor Search</h1>
+      {/* Component content */}
+    </div>
+  );
+};
+
+export default DoctorSearch;
