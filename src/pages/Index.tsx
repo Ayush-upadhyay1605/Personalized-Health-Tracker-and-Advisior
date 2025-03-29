@@ -7,10 +7,12 @@ import FeatureCard from '../components/features/FeatureCard';
 import FeatureItem from '../components/features/FeatureItem';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import ChatbotDialog from '@/components/ChatbotDialog';
 
 const Index = () => {
   // Check if user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -30,6 +32,11 @@ const Index = () => {
   };
 
   const handleFindDoctorsClick = () => {
+    // Open chatbot dialog when Find Doctors is clicked
+    setIsChatbotOpen(true);
+  };
+
+  const handleNavigateToDoctorSearch = () => {
     navigate('/doctor-search');
   };
 
@@ -113,14 +120,25 @@ const Index = () => {
           <p className="text-gray-600 mb-8">
             Join thousands of users who've improved their health with HealthHub.
           </p>
-          <button 
-            className="bg-health-primary text-white py-3 px-8 rounded-lg hover:bg-health-primary/90 transition-all duration-300 shadow-sm hover:shadow"
-            onClick={handleDashboardClick}
-          >
-            Get Started Today
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button 
+              className="bg-health-primary text-white py-3 px-8 rounded-lg hover:bg-health-primary/90 transition-all duration-300 shadow-sm hover:shadow"
+              onClick={handleDashboardClick}
+            >
+              Get Started Today
+            </button>
+            <button 
+              className="bg-white text-health-primary border border-health-primary py-3 px-8 rounded-lg hover:bg-health-primary/5 transition-all duration-300 shadow-sm hover:shadow"
+              onClick={handleNavigateToDoctorSearch}
+            >
+              Browse Doctors
+            </button>
+          </div>
         </div>
       </section>
+      
+      {/* Chatbot Dialog */}
+      <ChatbotDialog open={isChatbotOpen} onOpenChange={setIsChatbotOpen} />
       
       <Footer />
     </div>
