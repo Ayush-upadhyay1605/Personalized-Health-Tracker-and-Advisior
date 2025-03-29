@@ -1,10 +1,14 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Heart, Activity, Pill, User, Settings, Calendar } from 'lucide-react';
+import { Heart, Activity, Pill, User, Settings, Calendar, Bot } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
-const Sidebar = () => {
+interface SidebarProps {
+  openChatbot?: () => void;
+}
+
+const Sidebar = ({ openChatbot }: SidebarProps) => {
   const location = useLocation();
   const [expanded] = useState(true);
   const [user, setUser] = useState(null);
@@ -67,6 +71,19 @@ const Sidebar = () => {
               </Link>
             </li>
           ))}
+          
+          {/* Health Assistant Button */}
+          {openChatbot && (
+            <li>
+              <button
+                onClick={openChatbot}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-gray-700 hover:text-health-primary hover:bg-gray-50"
+              >
+                <Bot className="h-5 w-5" />
+                <span>Health Assistant</span>
+              </button>
+            </li>
+          )}
         </ul>
       </nav>
       
