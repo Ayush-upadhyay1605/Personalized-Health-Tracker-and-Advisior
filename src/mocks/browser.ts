@@ -8,18 +8,18 @@ export const handlers = [
   http.post('/api/gemini-chat', async ({ request }) => {
     try {
       const body = await request.json();
-      const { message } = body;
+      const userMessage = body.message || '';
       
       // Mock responses based on keywords
-      if (message.toLowerCase().includes('doctor')) {
+      if (userMessage.toLowerCase().includes('doctor')) {
         return HttpResponse.json({
           response: "Based on what you've described, I'd recommend seeing a primary care physician first. They can provide an initial assessment and refer you to a specialist if needed. Would you like me to help you find doctors in your area?"
         });
-      } else if (message.toLowerCase().includes('pain')) {
+      } else if (userMessage.toLowerCase().includes('pain')) {
         return HttpResponse.json({
           response: "I'm sorry to hear you're experiencing pain. The type of doctor you should see depends on where the pain is located. Could you provide more details about your symptoms?"
         });
-      } else if (message.toLowerCase().includes('specialist')) {
+      } else if (userMessage.toLowerCase().includes('specialist')) {
         return HttpResponse.json({
           response: "There are many types of specialists, including cardiologists (heart), dermatologists (skin), neurologists (brain/nerves), and orthopedists (bones/joints). Which area of your health are you concerned about?"
         });
