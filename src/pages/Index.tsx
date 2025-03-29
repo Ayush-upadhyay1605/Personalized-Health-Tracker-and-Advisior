@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Calendar, Activity, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +9,7 @@ import FeatureItem from '../components/features/FeatureItem';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import ChatbotDialog from '@/components/ChatbotDialog';
+import FloatingChatButton from '@/components/FloatingChatButton';
 
 const Index = () => {
   // Check if user is logged in
@@ -32,11 +34,7 @@ const Index = () => {
   };
 
   const handleFindDoctorsClick = () => {
-    // Open chatbot dialog when Find Doctors is clicked
-    setIsChatbotOpen(true);
-  };
-
-  const handleNavigateToDoctorSearch = () => {
+    // Navigate directly to doctor search page
     navigate('/doctor-search');
   };
 
@@ -129,7 +127,7 @@ const Index = () => {
             </button>
             <button 
               className="bg-white text-health-primary border border-health-primary py-3 px-8 rounded-lg hover:bg-health-primary/5 transition-all duration-300 shadow-sm hover:shadow"
-              onClick={handleNavigateToDoctorSearch}
+              onClick={handleFindDoctorsClick}
             >
               Browse Doctors
             </button>
@@ -139,6 +137,9 @@ const Index = () => {
       
       {/* Chatbot Dialog */}
       <ChatbotDialog open={isChatbotOpen} onOpenChange={setIsChatbotOpen} />
+      
+      {/* Floating Chat Button */}
+      <FloatingChatButton onClick={() => setIsChatbotOpen(true)} />
       
       <Footer />
     </div>
