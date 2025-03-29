@@ -15,6 +15,12 @@ interface ChatMessage {
   timestamp: Date;
 }
 
+// Define interface for the API message format
+interface ApiChatMessage {
+  role: 'user' | 'model';
+  parts: { text: string }[];
+}
+
 interface ChatbotDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -66,8 +72,8 @@ const ChatbotDialog = ({ open, onOpenChange }: ChatbotDialogProps) => {
     setIsLoading(true);
     
     try {
-      // Format messages for the API request
-      const historyForApi = messages.map(msg => ({
+      // Format messages for the API request - convert to API format with correct role types
+      const historyForApi: ApiChatMessage[] = messages.map(msg => ({
         role: msg.role === 'user' ? 'user' : 'model',
         parts: [{ text: msg.content }]
       }));
