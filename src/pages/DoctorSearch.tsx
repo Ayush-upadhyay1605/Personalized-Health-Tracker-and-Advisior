@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -18,7 +17,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Define libraries for Google Maps - fixing the type error
-const libraries: google.maps.Libraries = ['places'];
+import type { Libraries } from '@react-google-maps/api/dist/utils/make-load-script-url';
+const libraries: Libraries = ['places'];
 
 // Map container style
 const mapContainerStyle = {
