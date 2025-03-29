@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar } from '@/components/ui/avatar';
 import { SendHorizonal, Bot, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { sendChatMessage } from '@/services/geminiService';
 
 interface ChatMessage {
   id: string;
@@ -27,7 +28,7 @@ const ChatbotDialog = ({ open, onOpenChange }: ChatbotDialogProps) => {
     {
       id: '1',
       role: 'bot',
-      content: 'Hello! I\'m your health assistant. How can I help you find the right doctor today?',
+      content: 'Hello! I\'m your health assistant. I can help you with information about health conditions, symptoms, medications, and recommend which type of doctor you should consult. How can I assist you today?',
       timestamp: new Date(),
     },
   ]);
@@ -65,32 +66,20 @@ const ChatbotDialog = ({ open, onOpenChange }: ChatbotDialogProps) => {
     setIsLoading(true);
     
     try {
-      // Call the Gemini API through our backend function
-      const response = await fetch('/api/gemini-chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          message: input.trim(),
-          history: messages.map(msg => ({
-            role: msg.role === 'user' ? 'user' : 'model',
-            parts: [{ text: msg.content }]
-          }))
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to get response from assistant');
-      }
-      
-      const data = await response.json();
+      // Format messages for the API request
+      const historyForApi = messages.map(msg => ({
+        role: msg.role === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.content }]
+      }));
+
+      // Call the Gemini service
+      const response = await sendChatMessage(input.trim(), historyForApi);
       
       // Add bot response
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'bot',
-        content: data.response,
+        content: response,
         timestamp: new Date(),
       };
       
@@ -107,7 +96,7 @@ const ChatbotDialog = ({ open, onOpenChange }: ChatbotDialogProps) => {
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'bot',
-        content: "I'm having trouble connecting to my knowledge base. Could you please try again?",
+        content: "I'm having trouble connecting to my medical knowledge base. Could you please try again?",
         timestamp: new Date(),
       };
       
@@ -116,46 +105,6 @@ const ChatbotDialog = ({ open, onOpenChange }: ChatbotDialogProps) => {
       setIsLoading(false);
       inputRef.current?.focus();
     }
-  };
-  
-  // For demo purposes, if we don't have a backend yet
-  const handleSendMessageDemo = () => {
-    if (!input.trim()) return;
-    
-    // Add user message
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input.trim(),
-      timestamp: new Date(),
-    };
-    
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setIsLoading(true);
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      const demoResponses = [
-        "Based on your symptoms, you might want to consult with a cardiologist. Would you like me to help you find one in your area?",
-        "I understand your concern. From what you've described, a dermatologist would be the most appropriate specialist. Shall I locate one near you?",
-        "Your symptoms suggest you should see a general practitioner first. They can provide a proper diagnosis and refer you to a specialist if needed.",
-        "That sounds like it might require attention from an orthopedic specialist. Would you like me to find available doctors?",
-        "I recommend consulting with a neurologist for those symptoms. Would you like me to search for highly rated neurologists in your area?"
-      ];
-      
-      // Add bot response
-      const botMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'bot',
-        content: demoResponses[Math.floor(Math.random() * demoResponses.length)],
-        timestamp: new Date(),
-      };
-      
-      setMessages(prev => [...prev, botMessage]);
-      setIsLoading(false);
-      inputRef.current?.focus();
-    }, 1500);
   };
   
   const formatTime = (date: Date) => {
@@ -216,13 +165,13 @@ const ChatbotDialog = ({ open, onOpenChange }: ChatbotDialogProps) => {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessageDemo()}
-            placeholder="Type your health question..."
+            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+            placeholder="Ask about symptoms, health conditions, or which doctor to see..."
             className="flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-health-primary"
             disabled={isLoading}
           />
           <Button 
-            onClick={handleSendMessageDemo}
+            onClick={handleSendMessage}
             disabled={!input.trim() || isLoading}
             className="bg-health-primary hover:bg-health-primary/90"
           >
