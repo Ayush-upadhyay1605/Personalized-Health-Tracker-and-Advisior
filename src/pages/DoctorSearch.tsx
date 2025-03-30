@@ -1,9 +1,9 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Search, MapPin, Calendar, Star, Filter, 
-  Clock, Video, MessageSquare, Locate, MapIcon, ListFilter 
+  Clock, Video, MessageSquare, MapIcon, ListFilter 
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -12,26 +12,13 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import DoctorVideoCall from '@/components/DoctorVideoCall';
 import DoctorChat from '@/components/DoctorChat';
-import { GoogleMap, useLoadScript, Marker, InfoWindow } from '@react-google-maps/api';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useQuery } from '@tanstack/react-query';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-
-// Define libraries for Google Maps using proper typing
-// We need to explicitly type this as an array of valid library names
-const libraries: ("places" | "drawing" | "geometry" | "visualization")[] = ["places"];
 
 // Map container style
 const mapContainerStyle = {
   width: '100%',
   height: '500px',
   borderRadius: '0.5rem'
-};
-
-// Center on US by default
-const defaultCenter = {
-  lat: 37.7749,
-  lng: -122.4194
 };
 
 const DoctorSearch = () => {
@@ -44,8 +31,6 @@ const DoctorSearch = () => {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const [locationStatus, setLocationStatus] = useState('');
-  const [mapCenter, setMapCenter] = useState(defaultCenter);
-  const [selectedMapDoctor, setSelectedMapDoctor] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
 
   // Enhanced mock data for doctors with location coordinates
@@ -61,7 +46,8 @@ const DoctorSearch = () => {
       fee: '$150',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 40.7128, lng: -74.0060 } // New York
+      city: 'New York',
+      distance: 2.5
     },
     {
       id: 2,
@@ -74,7 +60,8 @@ const DoctorSearch = () => {
       fee: '$120',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 42.3601, lng: -71.0589 } // Boston
+      city: 'Boston',
+      distance: 3.8
     },
     {
       id: 3,
@@ -87,7 +74,8 @@ const DoctorSearch = () => {
       fee: '$130',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 41.8781, lng: -87.6298 } // Chicago
+      city: 'Chicago',
+      distance: 5.2
     },
     {
       id: 4,
@@ -100,7 +88,8 @@ const DoctorSearch = () => {
       fee: '$180',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 47.6062, lng: -122.3321 } // Seattle
+      city: 'Seattle',
+      distance: 8.7
     },
     {
       id: 5,
@@ -113,7 +102,8 @@ const DoctorSearch = () => {
       fee: '$160',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 37.7749, lng: -122.4194 } // San Francisco
+      city: 'San Francisco',
+      distance: 4.1
     },
     {
       id: 6,
@@ -126,7 +116,8 @@ const DoctorSearch = () => {
       fee: '$175',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1622902046580-2b47f47f5471?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 34.0522, lng: -118.2437 } // Los Angeles
+      city: 'Los Angeles',
+      distance: 3.3
     },
     {
       id: 7,
@@ -139,15 +130,10 @@ const DoctorSearch = () => {
       fee: '$190',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 25.7617, lng: -80.1918 } // Miami
+      city: 'Miami',
+      distance: 6.5
     }
   ];
-
-  // Load Google Maps script
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: "YOUR_API_KEY", // Replace with actual API key
-    libraries: libraries
-  });
 
   // Specialties list
   const specialties = [
@@ -160,89 +146,25 @@ const DoctorSearch = () => {
     'Orthopedic'
   ];
 
-  // Get user's location
+  // Get user's location (simplified version without Google Maps)
   const getUserLocation = useCallback(() => {
     setLocationStatus('loading');
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const userCoords = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          setUserLocation(userCoords);
-          setMapCenter(userCoords);
-          setLocationStatus('success');
-          
-          // Show success toast
-          toast({
-            title: "Location detected",
-            description: "Showing doctors near your location",
-          });
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          setLocationStatus('error');
-          
-          // Show error toast
-          toast({
-            title: "Location error",
-            description: "Could not access your location. Please enable location services.",
-            variant: "destructive",
-          });
-        },
-        { enableHighAccuracy: true }
-      );
-    } else {
-      setLocationStatus('unsupported');
+    // Instead of using real geolocation, we'll simulate it
+    setTimeout(() => {
+      setUserLocation({ city: 'Current Location' });
+      setLocationStatus('success');
       
-      // Show error toast
+      // Show success toast
       toast({
-        title: "Location unavailable",
-        description: "Your browser doesn't support geolocation.",
-        variant: "destructive",
+        title: "Location detected",
+        description: "Showing doctors near your location",
       });
-    }
+    }, 1500);
   }, [toast]);
-
-  // Calculate distance between two points using Haversine formula
-  const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Radius of the earth in km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    const d = R * c; // Distance in km
-    return d;
-  }, []);
-
-  // Sort doctors by distance from user
-  const getSortedDoctorsByDistance = useCallback(() => {
-    if (!userLocation) return [...doctors];
-    
-    return [...doctors].sort((a, b) => {
-      const distanceA = calculateDistance(
-        userLocation.lat, 
-        userLocation.lng, 
-        a.coordinates.lat, 
-        a.coordinates.lng
-      );
-      const distanceB = calculateDistance(
-        userLocation.lat, 
-        userLocation.lng, 
-        b.coordinates.lat, 
-        b.coordinates.lng
-      );
-      return distanceA - distanceB;
-    });
-  }, [userLocation, calculateDistance]);
 
   // Filter doctors based on search and specialty
   const getFilteredDoctors = useCallback(() => {
-    let filtered = getSortedDoctorsByDistance();
+    let filtered = [...doctors];
     
     if (selectedSpecialty !== 'All') {
       filtered = filtered.filter(doctor => doctor.specialty === selectedSpecialty);
@@ -257,23 +179,20 @@ const DoctorSearch = () => {
       );
     }
     
+    // If user location is set, sort by distance
+    if (userLocation) {
+      filtered.sort((a, b) => a.distance - b.distance);
+    }
+    
     return filtered;
-  }, [getSortedDoctorsByDistance, selectedSpecialty, searchQuery]);
+  }, [selectedSpecialty, searchQuery, userLocation]);
 
-  // Filter for nearby doctors (within 50km)
+  // Filter for nearby doctors (with pre-set distances)
   const getNearbyDoctors = useCallback(() => {
     if (!userLocation) return [];
     
-    return getSortedDoctorsByDistance().filter(doctor => {
-      const distance = calculateDistance(
-        userLocation.lat,
-        userLocation.lng,
-        doctor.coordinates.lat,
-        doctor.coordinates.lng
-      );
-      return distance <= 50; // 50km radius
-    });
-  }, [userLocation, getSortedDoctorsByDistance, calculateDistance]);
+    return getFilteredDoctors().filter(doctor => doctor.distance <= 5);
+  }, [userLocation, getFilteredDoctors]);
   
   // Get online consultation doctors
   const getOnlineDoctors = useCallback(() => {
@@ -345,14 +264,9 @@ const DoctorSearch = () => {
 
   // Doctor card component to avoid repetition
   const DoctorCard = ({ doctor, showDistance = false }) => {
-    // Calculate and format distance if user location is available
+    // Get distance text if user location is available
     const distanceText = showDistance && userLocation ? 
-      `${calculateDistance(
-        userLocation.lat, 
-        userLocation.lng, 
-        doctor.coordinates.lat, 
-        doctor.coordinates.lng
-      ).toFixed(1)} km away` : '';
+      `${doctor.distance.toFixed(1)} km away` : '';
 
     return (
       <Card key={doctor.id} className="overflow-hidden">
@@ -483,20 +397,8 @@ const DoctorSearch = () => {
     </Card>
   );
 
-  // Map content component
-  const renderMapSection = () => {
-    if (loadError) {
-      return (
-        <Alert variant="destructive" className="mb-4">
-          <AlertDescription>Error loading Google Maps. Please try again later.</AlertDescription>
-        </Alert>
-      );
-    }
-
-    if (!isLoaded) {
-      return <Skeleton className="w-full h-[500px] rounded-lg" />;
-    }
-
+  // Nearby doctors section (replacing Google Maps with simpler UI)
+  const renderNearbySection = () => {
     return (
       <div className="space-y-4">
         <div className="flex justify-between items-center">
@@ -506,125 +408,55 @@ const DoctorSearch = () => {
             variant="outline"
             className="flex items-center gap-2"
           >
-            <Locate className="h-4 w-4" />
+            <MapPin className="h-4 w-4" />
             {locationStatus === 'loading' ? 'Getting location...' : 'Update My Location'}
           </Button>
         </div>
         
-        <div className="relative rounded-lg overflow-hidden">
-          <GoogleMap
-            mapContainerStyle={mapContainerStyle}
-            center={mapCenter}
-            zoom={10}
-            options={{
-              streetViewControl: false,
-              mapTypeControl: false,
-            }}
-          >
-            {/* User location marker */}
-            {userLocation && (
-              <Marker
-                position={userLocation}
-                icon={{
-                  path: google.maps.SymbolPath.CIRCLE,
-                  scale: 8,
-                  fillColor: "#4285F4",
-                  fillOpacity: 1,
-                  strokeColor: "#ffffff",
-                  strokeWeight: 2,
-                }}
-                label={{
-                  text: "You",
-                  color: "#FFFFFF",
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                }}
-              />
-            )}
-            
-            {/* Doctor markers */}
-            {getNearbyDoctors().map((doctor) => (
-              <Marker
-                key={`marker-${doctor.id}`}
-                position={doctor.coordinates}
-                onClick={() => setSelectedMapDoctor(doctor)}
-              />
-            ))}
-            
-            {/* Info window for selected doctor */}
-            {selectedMapDoctor && (
-              <InfoWindow
-                position={selectedMapDoctor.coordinates}
-                onCloseClick={() => setSelectedMapDoctor(null)}
-              >
-                <div className="max-w-[280px]">
-                  <div className="flex items-center gap-2 mb-2">
-                    <img 
-                      src={selectedMapDoctor.image} 
-                      alt={selectedMapDoctor.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                    <div>
-                      <h3 className="font-medium text-sm">{selectedMapDoctor.name}</h3>
-                      <p className="text-xs text-gray-500">{selectedMapDoctor.specialty}</p>
-                    </div>
-                  </div>
-                  <p className="text-xs mb-1">
-                    <MapPin className="inline h-3 w-3 mr-1" />
-                    {selectedMapDoctor.location}
-                  </p>
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-sm font-medium">{selectedMapDoctor.fee}</span>
-                    <Button 
-                      size="sm" 
-                      className="h-8 bg-health-primary text-xs"
-                      onClick={() => handleBookAppointment(selectedMapDoctor)}
-                    >
-                      Book Now
-                    </Button>
+        {userLocation ? (
+          getNearbyDoctors().length > 0 ? (
+            <>
+              <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-5 w-5 text-blue-500 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-blue-700">Using location: {userLocation.city}</h4>
+                    <p className="text-sm text-blue-600">Showing doctors within 5km of your location</p>
                   </div>
                 </div>
-              </InfoWindow>
-            )}
-          </GoogleMap>
-        </div>
-        
-        {/* List of nearby doctors */}
-        <div className="mt-6 space-y-4">
-          {userLocation ? (
-            getNearbyDoctors().length > 0 ? (
-              <>
-                <h3 className="text-lg font-medium">Doctors within 50km ({getNearbyDoctors().length})</h3>
-                {getNearbyDoctors().map(doctor => (
-                  <DoctorCard key={`nearby-list-${doctor.id}`} doctor={doctor} showDistance={true} />
-                ))}
-              </>
-            ) : (
-              <div className="text-center py-8">
-                <MapIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No doctors found nearby</h3>
-                <p className="text-gray-500 mb-4">Try expanding your search or check other doctors below</p>
-                {getFilteredDoctors().length > 0 && (
-                  <div className="mt-8">
-                    <h3 className="text-lg font-medium mb-4">Other Available Doctors</h3>
-                    {getFilteredDoctors().slice(0, 3).map(doctor => (
-                      <DoctorCard key={`other-${doctor.id}`} doctor={doctor} showDistance={true} />
-                    ))}
-                  </div>
-                )}
               </div>
-            )
+              
+              <h3 className="text-lg font-medium">Doctors within 5km ({getNearbyDoctors().length})</h3>
+              
+              {getNearbyDoctors().map(doctor => (
+                <DoctorCard key={`nearby-list-${doctor.id}`} doctor={doctor} showDistance={true} />
+              ))}
+            </>
           ) : (
             <div className="text-center py-8">
-              <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">Enable Location Access</h3>
-              <p className="text-gray-500 mb-4">Allow location access to see doctors near you</p>
-              <Button onClick={getUserLocation} className="bg-health-primary hover:bg-health-primary/90">
-                Enable Location
-              </Button>
+              <MapIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium mb-2">No doctors found nearby</h3>
+              <p className="text-gray-500 mb-4">Try expanding your search or check other doctors below</p>
+              {getFilteredDoctors().length > 0 && (
+                <div className="mt-8">
+                  <h3 className="text-lg font-medium mb-4">Other Available Doctors</h3>
+                  {getFilteredDoctors().slice(0, 3).map(doctor => (
+                    <DoctorCard key={`other-${doctor.id}`} doctor={doctor} showDistance={true} />
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          )
+        ) : (
+          <div className="text-center py-8">
+            <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">Enable Location Access</h3>
+            <p className="text-gray-500 mb-4">Allow location access to see doctors near you</p>
+            <Button onClick={getUserLocation} className="bg-health-primary hover:bg-health-primary/90">
+              Enable Location
+            </Button>
+          </div>
+        )}
       </div>
     );
   };
@@ -780,7 +612,7 @@ const DoctorSearch = () => {
               </TabsContent>
               
               <TabsContent value="nearby">
-                {renderMapSection()}
+                {renderNearbySection()}
               </TabsContent>
               
               <TabsContent value="online" className="space-y-4">
