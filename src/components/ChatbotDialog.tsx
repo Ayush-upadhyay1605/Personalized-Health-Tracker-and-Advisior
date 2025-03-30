@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar } from '@/components/ui/avatar';
 import { SendHorizonal, Bot, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { sendChatMessage } from '@/services/geminiService';
 
 interface ChatMessage {
   id: string;
@@ -65,32 +66,20 @@ const ChatbotDialog = ({ open, onOpenChange }: ChatbotDialogProps) => {
     setIsLoading(true);
     
     try {
+      // Convert messages for API format
+      const messageHistory = messages.map(msg => ({
+        role: msg.role === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.content }]
+      }));
+
       // Call the Gemini API through our backend function
-      const response = await fetch('/api/gemini-chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          message: input.trim(),
-          history: messages.map(msg => ({
-            role: msg.role === 'user' ? 'user' : 'model',
-            parts: [{ text: msg.content }]
-          }))
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to get response from assistant');
-      }
-      
-      const data = await response.json();
+      const response = await sendChatMessage(input.trim(), messageHistory);
       
       // Add bot response
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'bot',
-        content: data.response,
+        content: response,
         timestamp: new Date(),
       };
       

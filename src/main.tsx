@@ -19,13 +19,18 @@ if (root) {
   console.error("Root element not found");
 }
 
-// Configure the Supabase API proxy for local development
+// Only set up the mock service worker in development
 if (import.meta.env.DEV) {
-  const { worker } = await import('./mocks/browser');
-  worker.start({
-    serviceWorker: {
-      url: '/mockServiceWorker.js',
-    },
-    onUnhandledRequest: 'bypass',
-  });
+  const setupMocks = async () => {
+    try {
+      const { worker } = await import('./mocks/browser');
+      await worker.start({
+        onUnhandledRequest: 'bypass',
+      });
+    } catch (error) {
+      console.error('Error starting MSW:', error);
+    }
+  };
+  
+  setupMocks();
 }

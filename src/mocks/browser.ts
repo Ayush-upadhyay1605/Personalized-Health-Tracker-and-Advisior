@@ -29,10 +29,18 @@ export const handlers = [
         });
       }
     } catch (error) {
-      return new HttpResponse(null, { status: 500 });
+      console.error('Mock service worker error:', error);
+      return new HttpResponse(JSON.stringify({ 
+        error: 'Failed to process request' 
+      }), { 
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
     }
   }),
 ];
 
-// Create the service worker
+// Create and export the service worker with proper error handling
 export const worker = setupWorker(...handlers);

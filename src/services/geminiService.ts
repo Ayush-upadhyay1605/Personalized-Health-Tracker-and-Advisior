@@ -3,9 +3,13 @@
  * Service for interacting with Google Gemini API through our backend
  */
 
+interface ChatPart {
+  text: string;
+}
+
 interface ChatMessage {
   role: 'user' | 'model';
-  parts: { text: string }[];
+  parts: ChatPart[];
 }
 
 interface GeminiChatRequest {
