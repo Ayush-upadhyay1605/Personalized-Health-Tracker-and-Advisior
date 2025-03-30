@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
 import './index.css';
 
@@ -9,28 +8,8 @@ import './index.css';
 const root = document.getElementById("root");
 if (root) {
   createRoot(root).render(
-    <React.StrictMode>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </React.StrictMode>
+    <App />
   );
 } else {
   console.error("Root element not found");
-}
-
-// Only set up the mock service worker in development
-if (import.meta.env.DEV) {
-  const setupMocks = async () => {
-    try {
-      const { worker } = await import('./mocks/browser');
-      await worker.start({
-        onUnhandledRequest: 'bypass',
-      });
-    } catch (error) {
-      console.error('Error starting MSW:', error);
-    }
-  };
-  
-  setupMocks();
 }
