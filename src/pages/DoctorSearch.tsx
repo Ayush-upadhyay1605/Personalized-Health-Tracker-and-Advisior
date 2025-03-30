@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -16,8 +17,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-// Define libraries as proper type for Google Maps
-const libraries = ['places'] as google.maps.Libraries;
+// Define libraries as a string array, which is the correct type for @react-google-maps/api
+const libraries = ['places'];
 
 // Map container style
 const mapContainerStyle = {
