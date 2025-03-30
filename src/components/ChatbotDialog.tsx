@@ -66,9 +66,9 @@ const ChatbotDialog = ({ open, onOpenChange }: ChatbotDialogProps) => {
     setIsLoading(true);
     
     try {
-      // Convert messages for API format
+      // Convert messages for API format - with explicit type assertion to match the expected type
       const messageHistory = messages.map(msg => ({
-        role: msg.role === 'user' ? 'user' : 'model',
+        role: msg.role === 'user' ? 'user' as const : 'model' as const,
         parts: [{ text: msg.content }]
       }));
 

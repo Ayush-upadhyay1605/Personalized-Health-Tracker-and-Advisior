@@ -7,7 +7,7 @@ export const handlers = [
   // Mock the Gemini API endpoint
   http.post('/api/gemini-chat', async ({ request }) => {
     try {
-      const body = await request.json();
+      const body = await request.json() as { message: string };
       const userMessage = body.message || '';
       
       // Mock responses based on keywords
