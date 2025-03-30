@@ -12,13 +12,13 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import DoctorVideoCall from '@/components/DoctorVideoCall';
 import DoctorChat from '@/components/DoctorChat';
-import { GoogleMap, useLoadScript, Marker, InfoWindow } from '@react-google-maps/api';
+import { GoogleMap, useLoadScript, Marker, InfoWindow, Libraries } from '@react-google-maps/api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-// Define libraries as a string array, which is the correct type for @react-google-maps/api
-const libraries = ['places'];
+// Define libraries using the proper Libraries type
+const libraries: Libraries = ['places'];
 
 // Map container style
 const mapContainerStyle = {
