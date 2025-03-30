@@ -19,7 +19,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Define libraries for Google Maps - fixing the type error
 // Using the proper type for Google Maps libraries
-const libraries: ("places" | "drawing" | "geometry" | "localContext" | "visualization")[] = ["places"];
+const libraries: google.maps.Libraries = ['places'];
 
 // Map container style
 const mapContainerStyle = {
