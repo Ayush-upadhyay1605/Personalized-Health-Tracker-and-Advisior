@@ -1,9 +1,29 @@
 
-import { User, Phone, Mail, MapPin, Activity, AlertTriangle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { User, Phone, Mail, MapPin, Activity, AlertTriangle, Edit, Save, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Profile = () => {
-  const medicalConditions = [
+  const { toast } = useToast();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  
+  // Profile form data
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phone: '',
+    email: '',
+    address: '',
+    bloodType: ''
+  });
+  
+  // Medical conditions and allergies data
+  const [medicalConditions, setMedicalConditions] = useState([
     {
       condition: 'Hypertension',
       diagnosedYear: '2020',
@@ -14,9 +34,9 @@ const Profile = () => {
       diagnosedYear: '2018',
       status: 'Managed'
     }
-  ];
+  ]);
   
-  const allergies = [
+  const [allergies, setAllergies] = useState([
     {
       name: 'Penicillin Allergy',
       severity: 'high'
@@ -29,11 +49,125 @@ const Profile = () => {
       name: 'Aspirin Interaction',
       severity: 'low'
     }
-  ];
+  ]);
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      setLoading(true);
+      
+      // Get current user
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: "Not authenticated",
+          description: "Please sign in to view your profile",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const currentUser = session.user;
+      setUser(currentUser);
+      
+      // Set initial form data from user metadata or default values
+      setFormData({
+        fullName: currentUser.user_metadata?.full_name || 'John Doe',
+        phone: currentUser.user_metadata?.phone || '+1 (555) 123-4567',
+        email: currentUser.email || '',
+        address: currentUser.user_metadata?.address || '123 Health St, Medical City',
+        bloodType: currentUser.user_metadata?.blood_type || 'A+'
+      });
+    } catch (error: any) {
+      console.error('Error fetching profile:', error);
+      toast({
+        title: "Error fetching profile",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      setLoading(true);
+      
+      // Update user metadata
+      const { error } = await supabase.auth.updateUser({
+        data: {
+          full_name: formData.fullName,
+          phone: formData.phone,
+          address: formData.address,
+          blood_type: formData.bloodType
+        }
+      });
+      
+      if (error) throw error;
+      
+      setEditMode(false);
+      toast({
+        title: "Profile updated",
+        description: "Your profile information has been updated successfully",
+      });
+      
+      // Refresh user data
+      fetchUserProfile();
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Error updating profile",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading && !user) {
+    return <div className="p-6">Loading profile information...</div>;
+  }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Profile</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Profile</h1>
+        {!editMode ? (
+          <Button onClick={() => setEditMode(true)} variant="outline" className="flex items-center gap-2">
+            <Edit className="h-4 w-4" />
+            Edit Profile
+          </Button>
+        ) : (
+          <div className="flex gap-2">
+            <Button onClick={handleSaveProfile} variant="default" className="flex items-center gap-2">
+              <Save className="h-4 w-4" />
+              Save
+            </Button>
+            <Button onClick={() => {
+              setEditMode(false);
+              fetchUserProfile(); // Reset form data
+            }} variant="outline" className="flex items-center gap-2">
+              <X className="h-4 w-4" />
+              Cancel
+            </Button>
+          </div>
+        )}
+      </div>
       
       {/* Profile Overview */}
       <Card>
@@ -43,8 +177,19 @@ const Profile = () => {
               <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center mb-3">
                 <User className="h-16 w-16 text-gray-400" />
               </div>
-              <h2 className="text-xl font-bold text-center">Ayush Upadhyay</h2>
-              <p className="text-muted-foreground text-center">Patient ID: #123456</p>
+              {editMode ? (
+                <Input 
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  className="text-center"
+                />
+              ) : (
+                <h2 className="text-xl font-bold text-center">{formData.fullName}</h2>
+              )}
+              <p className="text-muted-foreground text-center">
+                {user?.id ? `Patient ID: #${user.id.substring(0, 6)}` : 'Loading...'}
+              </p>
             </div>
             
             <div className="md:w-3/4 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -52,7 +197,15 @@ const Profile = () => {
                 <Phone className="h-5 w-5 text-gray-500 mt-1" />
                 <div>
                   <p className="text-sm text-muted-foreground">Phone</p>
-                  <p className="font-medium">+1 (555) 123-4567</p>
+                  {editMode ? (
+                    <Input 
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    <p className="font-medium">{formData.phone}</p>
+                  )}
                 </div>
               </div>
               
@@ -60,7 +213,7 @@ const Profile = () => {
                 <Mail className="h-5 w-5 text-gray-500 mt-1" />
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">john.doe@example.com</p>
+                  <p className="font-medium">{formData.email}</p>
                 </div>
               </div>
               
@@ -68,7 +221,15 @@ const Profile = () => {
                 <MapPin className="h-5 w-5 text-gray-500 mt-1" />
                 <div>
                   <p className="text-sm text-muted-foreground">Address</p>
-                  <p className="font-medium">123 Health St, Medical City</p>
+                  {editMode ? (
+                    <Input 
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    <p className="font-medium">{formData.address}</p>
+                  )}
                 </div>
               </div>
               
@@ -76,7 +237,15 @@ const Profile = () => {
                 <Activity className="h-5 w-5 text-gray-500 mt-1" />
                 <div>
                   <p className="text-sm text-muted-foreground">Blood Type</p>
-                  <p className="font-medium">A+</p>
+                  {editMode ? (
+                    <Input 
+                      name="bloodType"
+                      value={formData.bloodType}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    <p className="font-medium">{formData.bloodType}</p>
+                  )}
                 </div>
               </div>
             </div>
