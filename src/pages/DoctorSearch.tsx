@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -139,16 +138,114 @@ const DoctorSearch = () => {
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 25.7617, lng: -80.1918 } // Miami
+    },
+    {
+      id: 8,
+      name: 'Dr. Thomas Wright',
+      specialty: 'Ophthalmologist',
+      experience: '22 years',
+      location: 'Vision Care Center, Denver',
+      rating: 4.9,
+      reviews: 203,
+      fee: '$170',
+      availableToday: true,
+      image: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 39.7392, lng: -104.9903 } // Denver
+    },
+    {
+      id: 9,
+      name: 'Dr. Lisa Thompson',
+      specialty: 'Psychiatrist',
+      experience: '15 years',
+      location: 'Mental Health Institute, Portland',
+      rating: 4.8,
+      reviews: 176,
+      fee: '$200',
+      availableToday: true,
+      image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 45.5051, lng: -122.6750 } // Portland
+    },
+    {
+      id: 10,
+      name: 'Dr. David Brown',
+      specialty: 'Endocrinologist',
+      experience: '19 years',
+      location: 'Diabetes & Hormone Center, Austin',
+      rating: 4.7,
+      reviews: 135,
+      fee: '$185',
+      availableToday: false,
+      image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 30.2672, lng: -97.7431 } // Austin
+    },
+    {
+      id: 11,
+      name: 'Dr. Jennifer Adams',
+      specialty: 'Allergist',
+      experience: '11 years',
+      location: 'Allergy & Asthma Clinic, Minneapolis',
+      rating: 4.6,
+      reviews: 98,
+      fee: '$140',
+      availableToday: true,
+      image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 44.9778, lng: -93.2650 } // Minneapolis
+    },
+    {
+      id: 12,
+      name: 'Dr. Carlos Martinez',
+      specialty: 'Urologist',
+      experience: '16 years',
+      location: 'Urology Associates, Phoenix',
+      rating: 4.8,
+      reviews: 142,
+      fee: '$165',
+      availableToday: false,
+      image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 33.4484, lng: -112.0740 } // Phoenix
+    },
+    {
+      id: 13,
+      name: 'Dr. Rebecca White',
+      specialty: 'Oncologist',
+      experience: '21 years',
+      location: 'Cancer Treatment Center, Houston',
+      rating: 4.9,
+      reviews: 215,
+      fee: '$220',
+      availableToday: true,
+      image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 29.7604, lng: -95.3698 } // Houston
+    },
+    {
+      id: 14,
+      name: 'Dr. Jason Kim',
+      specialty: 'Rheumatologist',
+      experience: '14 years',
+      location: 'Arthritis & Rheumatology Center, Philadelphia',
+      rating: 4.7,
+      reviews: 132,
+      fee: '$175',
+      availableToday: true,
+      image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 39.9526, lng: -75.1652 } // Philadelphia
+    },
+    {
+      id: 15,
+      name: 'Dr. Samantha Scott',
+      specialty: 'Hematologist',
+      experience: '17 years',
+      location: 'Blood Disorders Clinic, Atlanta',
+      rating: 4.8,
+      reviews: 154,
+      fee: '$190',
+      availableToday: false,
+      image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 33.7490, lng: -84.3880 } // Atlanta
     }
   ];
 
-  // Load Google Maps script
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: "YOUR_API_KEY", // Replace with actual API key
-    libraries: libraries
-  });
-
-  // Specialties list
+  // Update specialties list to include all specialties from doctors data
   const specialties = [
     'All', 
     'Cardiologist', 
@@ -156,8 +253,22 @@ const DoctorSearch = () => {
     'Gynecologist', 
     'Neurologist', 
     'Pediatrician', 
-    'Orthopedic'
+    'Orthopedic',
+    'Ophthalmologist',
+    'Psychiatrist',
+    'Endocrinologist',
+    'Allergist',
+    'Urologist',
+    'Oncologist',
+    'Rheumatologist',
+    'Hematologist'
   ];
+
+  // Load Google Maps script
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: "YOUR_API_KEY", // Replace with actual API key
+    libraries: libraries
+  });
 
   // Get user's location
   const getUserLocation = useCallback(() => {
