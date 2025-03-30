@@ -17,9 +17,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-// Define libraries for Google Maps - fixing the type error
-// Using the proper type for Google Maps libraries
-const libraries: google.maps.Libraries = ['places'];
+// Define libraries for Google Maps
+// Using an array of library names that are acceptable to the Google Maps API
+const libraries = ['places'] as const;
 
 // Map container style
 const mapContainerStyle = {
