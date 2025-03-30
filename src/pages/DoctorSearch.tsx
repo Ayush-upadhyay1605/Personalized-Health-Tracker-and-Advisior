@@ -18,8 +18,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Define libraries for Google Maps
-// Using an array of library names that are acceptable to the Google Maps API
-const libraries = ['places'] as const;
+// Use an array of strings without readonly modifier for the Google Maps libraries
+const libraries = ['places'];
 
 // Map container style
 const mapContainerStyle = {
