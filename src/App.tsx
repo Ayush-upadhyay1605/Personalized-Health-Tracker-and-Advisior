@@ -16,6 +16,7 @@ import BookAppointment from "./pages/BookAppointment";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import DashboardLayout from "./components/DashboardLayout";
+import Welcome from "./pages/Welcome";
 
 // Create a new QueryClient instance outside of component render
 const queryClient = new QueryClient({
@@ -35,7 +36,8 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<Welcome />} />
+            <Route path="/home" element={<Index />} />
             
             {/* Doctor Search and Booking Routes */}
             <Route path="/doctor-search" element={<DoctorSearch />} />

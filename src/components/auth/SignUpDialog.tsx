@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Phone, Building } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,12 +13,16 @@ interface SignUpDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenSignIn: () => void;
+  userType?: 'patient' | 'doctor';
 }
 
-const SignUpDialog = ({ isOpen, onClose, onOpenSignIn }: SignUpDialogProps) => {
+const SignUpDialog = ({ isOpen, onClose, onOpenSignIn, userType = 'patient' }: SignUpDialogProps) => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [hospitalName, setHospitalName] = useState('');
+  const [specialty, setSpecialty] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -35,6 +39,12 @@ const SignUpDialog = ({ isOpen, onClose, onOpenSignIn }: SignUpDialogProps) => {
         options: {
           data: {
             full_name: fullName,
+            phone: phone,
+            role: userType,
+            ...(userType === 'doctor' && {
+              hospital: hospitalName,
+              specialty: specialty
+            }),
           },
         },
       });
@@ -49,7 +59,12 @@ const SignUpDialog = ({ isOpen, onClose, onOpenSignIn }: SignUpDialogProps) => {
       });
       
       onClose();
-      navigate("/");
+      if (userType === 'patient') {
+        navigate("/home");
+      } else {
+        // For doctors, we might want a different dashboard
+        navigate("/dashboard");
+      }
     } catch (error: any) {
       toast({
         title: "Sign up failed",
@@ -64,11 +79,13 @@ const SignUpDialog = ({ isOpen, onClose, onOpenSignIn }: SignUpDialogProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md p-6 overflow-hidden">
+      <DialogContent className="sm:max-w-md p-6 overflow-hidden max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-center">Create an Account</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-center">
+            {userType === 'patient' ? 'Create Patient Account' : 'Create Doctor Account'}
+          </DialogTitle>
           <DialogDescription className="text-center text-gray-500">
-            Join HealthHub to manage your health journey
+            Join HealthHub to {userType === 'patient' ? 'manage your health journey' : 'connect with patients'}
           </DialogDescription>
         </DialogHeader>
         
@@ -104,6 +121,57 @@ const SignUpDialog = ({ isOpen, onClose, onOpenSignIn }: SignUpDialogProps) => {
               />
             </div>
           </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="phone">Phone Number</Label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="+1 (555) 123-4567"
+                className="pl-10"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+          
+          {userType === 'doctor' && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="hospital">Hospital/Clinic Name</Label>
+                <div className="relative">
+                  <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    id="hospital"
+                    type="text"
+                    placeholder="General Hospital"
+                    className="pl-10"
+                    value={hospitalName}
+                    onChange={(e) => setHospitalName(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="specialty">Medical Specialty</Label>
+                <div className="relative">
+                  <Input
+                    id="specialty"
+                    type="text"
+                    placeholder="Cardiology, Pediatrics, etc."
+                    className="pl-3"
+                    value={specialty}
+                    onChange={(e) => setSpecialty(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+            </>
+          )}
           
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
@@ -142,7 +210,11 @@ const SignUpDialog = ({ isOpen, onClose, onOpenSignIn }: SignUpDialogProps) => {
           
           <Button 
             type="submit" 
-            className="w-full bg-health-primary hover:bg-health-primary/90"
+            className={`w-full ${
+              userType === 'patient' 
+                ? 'bg-health-primary hover:bg-health-primary/90' 
+                : 'bg-health-secondary hover:bg-health-secondary/90'
+            }`}
             disabled={isLoading}
           >
             {isLoading ? "Creating Account..." : "Create Account"}

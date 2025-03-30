@@ -14,9 +14,10 @@ interface SignInDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenSignUp: () => void;
+  userType?: 'patient' | 'doctor';
 }
 
-const SignInDialog = ({ isOpen, onClose, onOpenSignUp }: SignInDialogProps) => {
+const SignInDialog = ({ isOpen, onClose, onOpenSignUp, userType = 'patient' }: SignInDialogProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +46,14 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp }: SignInDialogProps) => {
       });
       
       onClose();
-      navigate("/");
+      
+      // Redirect based on user type
+      if (userType === 'patient') {
+        navigate("/home");
+      } else {
+        // For doctors, we might want a different dashboard
+        navigate("/dashboard");
+      }
     } catch (error: any) {
       toast({
         title: "Sign in failed",
@@ -63,7 +71,9 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp }: SignInDialogProps) => {
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-md p-6 overflow-hidden">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-center">Welcome Back</DialogTitle>
+            <DialogTitle className="text-xl font-semibold text-center">
+              {userType === 'patient' ? 'Patient Login' : 'Doctor Login'}
+            </DialogTitle>
             <DialogDescription className="text-center text-gray-500">
               Sign in to your HealthHub account
             </DialogDescription>
@@ -127,7 +137,11 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp }: SignInDialogProps) => {
             
             <Button 
               type="submit" 
-              className="w-full bg-health-primary hover:bg-health-primary/90"
+              className={`w-full ${
+                userType === 'patient' 
+                  ? 'bg-health-primary hover:bg-health-primary/90' 
+                  : 'bg-health-secondary hover:bg-health-secondary/90'
+              }`}
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}

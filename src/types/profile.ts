@@ -2,6 +2,7 @@
 export interface UserProfile {
   id: string;
   email: string;
+  role?: 'patient' | 'doctor';
   user_metadata?: {
     full_name?: string;
     phone?: string;
