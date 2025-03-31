@@ -23,7 +23,7 @@ const Sidebar = () => {
   return (
     <div className="w-64 h-screen bg-white border-r border-gray-200 flex flex-col">
       <div className="p-6">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/home" className="flex items-center gap-2">
           <Heart className="h-6 w-6 text-health-primary" />
           <span className="text-health-primary text-xl font-bold">Health Buddy</span>
         </Link>
