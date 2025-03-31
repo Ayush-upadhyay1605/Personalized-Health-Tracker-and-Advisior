@@ -1,14 +1,21 @@
 
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Heart, Activity, Pill, User, Settings, Calendar } from 'lucide-react';
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [expanded] = useState(true);
 
   const isActive = (path: string) => {
     return location.pathname === path;
+  };
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigate('/home');
+    console.log('Sidebar logo: Navigating to /home');
   };
 
   const menuItems = [
@@ -23,7 +30,7 @@ const Sidebar = () => {
   return (
     <div className="w-64 h-screen bg-white border-r border-gray-200 flex flex-col">
       <div className="p-6">
-        <Link to="/home" className="flex items-center gap-2">
+        <Link to="/home" onClick={handleLogoClick} className="flex items-center gap-2">
           <Heart className="h-6 w-6 text-health-primary" />
           <span className="text-health-primary text-xl font-bold">Health Buddy</span>
         </Link>
