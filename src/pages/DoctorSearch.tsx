@@ -15,6 +15,7 @@ import { GoogleMap, useLoadScript, Marker, InfoWindow, Libraries } from '@react-
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import BackToHomeButton from '@/components/navigation/BackToHomeButton';
 
 // Define libraries using the proper Libraries type
 const libraries: Libraries = ['places'];
@@ -745,13 +746,7 @@ const DoctorSearch = () => {
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-900">Find Doctors</h1>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/')}
-              className="text-health-primary border-health-primary hover:bg-health-primary/10"
-            >
-              Back to Home
-            </Button>
+            <BackToHomeButton />
           </div>
           <div className="mt-4 relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -768,174 +763,4 @@ const DoctorSearch = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="w-full md:w-64 bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex items-center gap-2 mb-4">
-              <Filter className="h-5 w-5 text-gray-500" />
-              <h2 className="text-lg font-medium">Filters</h2>
-            </div>
-            
-            <div className="mb-6">
-              <h3 className="text-sm font-medium mb-2">Specialties</h3>
-              <div className="space-y-2">
-                {specialties.map((specialty) => (
-                  <div key={specialty} className="flex items-center">
-                    <input
-                      type="radio"
-                      id={specialty}
-                      name="specialty"
-                      checked={selectedSpecialty === specialty}
-                      onChange={() => setSelectedSpecialty(specialty)}
-                      className="h-4 w-4 text-health-primary focus:ring-health-primary"
-                    />
-                    <label htmlFor={specialty} className="ml-2 text-sm text-gray-700">
-                      {specialty}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="mb-6">
-              <h3 className="text-sm font-medium mb-2">Availability</h3>
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="available-today"
-                    className="h-4 w-4 text-health-primary focus:ring-health-primary"
-                  />
-                  <label htmlFor="available-today" className="ml-2 text-sm text-gray-700">
-                    Available Today
-                  </label>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="available-tomorrow"
-                    className="h-4 w-4 text-health-primary focus:ring-health-primary"
-                  />
-                  <label htmlFor="available-tomorrow" className="ml-2 text-sm text-gray-700">
-                    Available Tomorrow
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-medium mb-2">Sort by</h3>
-              <select className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-health-primary focus:border-health-primary sm:text-sm">
-                <option>Relevance</option>
-                <option>Experience: High to Low</option>
-                <option>Fee: Low to High</option>
-                <option>Rating</option>
-              </select>
-            </div>
-            
-            {/* Location section */}
-            {userLocation && (
-              <div className="mt-6 border-t pt-4">
-                <h3 className="text-sm font-medium mb-2">Your Location</h3>
-                <div className="bg-blue-50 p-2 rounded-md flex items-start gap-2">
-                  <MapPin className="h-4 w-4 text-blue-500 mt-0.5" />
-                  <div className="text-xs text-blue-700">
-                    Location detected
-                    <Button 
-                      variant="link" 
-                      className="text-xs p-0 h-auto text-blue-600"
-                      onClick={getUserLocation}
-                    >
-                      Update
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="flex-1">
-            <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange}>
-              <TabsList className="mb-4">
-                <TabsTrigger value="all">All Doctors</TabsTrigger>
-                <TabsTrigger value="nearby">Nearby</TabsTrigger>
-                <TabsTrigger value="online">Online Consultation</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="all" className="space-y-4">
-                <div className="text-sm text-gray-500 mb-2">
-                  {getFilteredDoctors().length} doctors found
-                  {userLocation && (
-                    <span className="ml-2 text-blue-600">
-                      (sorted by distance)
-                    </span>
-                  )}
-                </div>
-                
-                {getFilteredDoctors().length > 0 ? (
-                  getFilteredDoctors().map((doctor) => (
-                    <DoctorCard 
-                      key={`all-${doctor.id}`} 
-                      doctor={doctor}
-                      showDistance={!!userLocation} 
-                    />
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <ListFilter className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium mb-2">No doctors found</h3>
-                    <p className="text-gray-500">Try adjusting your search criteria</p>
-                  </div>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="nearby">
-                {renderMapSection()}
-              </TabsContent>
-              
-              <TabsContent value="online" className="space-y-4">
-                {getOnlineDoctors().length > 0 ? (
-                  <div className="space-y-4">
-                    <div className="text-sm text-gray-500 mb-2">
-                      {getOnlineDoctors().length} doctors available for online consultation
-                    </div>
-                    
-                    {getOnlineDoctors().map((doctor) => (
-                      <OnlineDoctorCard key={`online-${doctor.id}`} doctor={doctor} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Video className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium mb-2">No online doctors available</h3>
-                    <p className="text-gray-500">Try again later or check other options</p>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
-      </main>
-
-      {selectedDoctor && (
-        <DoctorVideoCall 
-          doctorName={selectedDoctor.name}
-          doctorImage={selectedDoctor.image}
-          open={isVideoCallOpen}
-          onOpenChange={setIsVideoCallOpen}
-        />
-      )}
-
-      {selectedDoctor && (
-        <DoctorChat 
-          doctorName={selectedDoctor.name}
-          doctorImage={selectedDoctor.image}
-          open={isChatOpen}
-          onOpenChange={setIsChatOpen}
-        />
-      )}
-    </div>
-  );
-};
-
-export default DoctorSearch;
+      <main className="max-w-7xl mx-auto px-4 py-6
