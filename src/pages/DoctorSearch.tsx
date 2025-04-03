@@ -27,8 +27,8 @@ interface Doctor {
 
 const DoctorSearch = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [specialty, setSpecialty] = useState('');
-  const [location, setLocation] = useState('');
+  const [specialty, setSpecialty] = useState('all');
+  const [location, setLocation] = useState('all');
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -111,8 +111,8 @@ const DoctorSearch = () => {
       doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       doctor.specialty.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesSpecialty = specialty === '' || doctor.specialty === specialty;
-    const matchesLocation = location === '' || doctor.location?.includes(location);
+    const matchesSpecialty = specialty === 'all' || doctor.specialty === specialty;
+    const matchesLocation = location === 'all' || doctor.location?.includes(location);
     
     return matchesSearch && matchesSpecialty && matchesLocation;
   });
