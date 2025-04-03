@@ -14,26 +14,18 @@ const DoctorList = ({ loading, filteredDoctors }: DoctorListProps) => {
     return (
       <div className="space-y-6">
         {Array(3).fill(0).map((_, index) => (
-          <Card key={index} className="overflow-hidden">
-            <div className="md:flex">
-              <div className="md:w-1/4 p-6 flex items-center justify-center">
-                <Skeleton className="h-24 w-24 rounded-full" />
-              </div>
-              <CardContent className="p-6 md:w-3/4">
-                <div className="space-y-3">
-                  <Skeleton className="h-6 w-1/3" />
+          <Card key={index}>
+            <CardContent className="p-6">
+              <div className="flex items-start space-x-4">
+                <Skeleton className="h-16 w-16 rounded-full" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-4 w-1/3" />
                   <Skeleton className="h-4 w-1/2" />
                   <Skeleton className="h-4 w-1/4" />
-                  <div className="flex space-x-2 mt-3">
-                    <Skeleton className="h-4 w-16" />
-                    <Skeleton className="h-4 w-24" />
-                  </div>
-                  <div className="flex justify-end mt-4">
-                    <Skeleton className="h-10 w-36" />
-                  </div>
                 </div>
-              </CardContent>
-            </div>
+                <Skeleton className="h-10 w-28" />
+              </div>
+            </CardContent>
           </Card>
         ))}
       </div>
@@ -43,11 +35,8 @@ const DoctorList = ({ loading, filteredDoctors }: DoctorListProps) => {
   if (filteredDoctors.length === 0) {
     return (
       <Card>
-        <CardContent className="p-8">
-          <div className="text-center">
-            <p className="text-gray-500 mb-4">No doctors found matching your criteria.</p>
-            <p className="text-gray-500 text-sm">Try adjusting your search filters or try a different specialty.</p>
-          </div>
+        <CardContent className="p-8 text-center">
+          <p className="text-gray-500">No doctors found matching your criteria.</p>
         </CardContent>
       </Card>
     );
@@ -55,7 +44,6 @@ const DoctorList = ({ loading, filteredDoctors }: DoctorListProps) => {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-gray-500">{filteredDoctors.length} doctors found</p>
       {filteredDoctors.map((doctor) => (
         <DoctorCard key={doctor.id} doctor={doctor} />
       ))}
