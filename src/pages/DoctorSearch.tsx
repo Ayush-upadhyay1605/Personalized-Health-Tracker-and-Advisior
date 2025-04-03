@@ -38,14 +38,30 @@ const DoctorSearch = () => {
       setLoading(true);
       
       try {
-        // Query from our database for real doctors
-        const { data: realDoctors, error } = await supabase.auth.getSession();
+        // Query all users with role=doctor from Supabase
+        const { data: { users }, error } = await supabase.auth.admin.listUsers();
         
         if (error) {
-          console.error('Error fetching doctors:', error);
+          throw error;
         }
         
-        // Our sample doctor data (always include it)
+        // Filter users with role 'doctor' and map to our Doctor interface
+        const doctorUsers = users
+          .filter(user => user.user_metadata?.role === 'doctor')
+          .map(user => ({
+            id: user.id,
+            name: user.user_metadata?.full_name || 'Unknown Doctor',
+            specialty: user.user_metadata?.specialty || 'General Medicine',
+            hospital: user.user_metadata?.hospital || 'Unknown Hospital',
+            email: user.email || '',
+            rating: 4.8, // Default rating for now
+            location: user.user_metadata?.location || 'Unknown Location',
+            image: user.user_metadata?.image || '/placeholder.svg',
+            fee: user.user_metadata?.fee || '$100',
+            availability: user.user_metadata?.availability || ['Today']
+          }));
+        
+        // Our sample doctor data (always include it if no doctors found)
         const sampleDoctors: Doctor[] = [
           {
             id: '1',
@@ -85,9 +101,52 @@ const DoctorSearch = () => {
           }
         ];
         
-        setDoctors(sampleDoctors);
+        // Combine real doctors with sample doctors
+        // Only use sample doctors if no real doctors found
+        const allDoctors = doctorUsers.length > 0 ? doctorUsers : sampleDoctors;
+        setDoctors(allDoctors);
       } catch (error) {
         console.error('Error in doctor search:', error);
+        // Fallback to sample data
+        const sampleDoctors: Doctor[] = [
+          {
+            id: '1',
+            name: 'Dr. Sample',
+            specialty: 'General Medicine',
+            hospital: 'General Hospital',
+            email: 'doctor@example.com',
+            rating: 4.8,
+            location: 'New York, NY',
+            image: '/placeholder.svg',
+            fee: '$100',
+            availability: ['Today', 'Tomorrow']
+          },
+          {
+            id: '2',
+            name: 'Dr. Jane Smith',
+            specialty: 'Cardiology',
+            hospital: 'Heart Center',
+            email: 'drjane@example.com',
+            rating: 4.9,
+            location: 'Boston, MA',
+            image: '/placeholder.svg',
+            fee: '$150',
+            availability: ['Tomorrow']
+          },
+          {
+            id: '3',
+            name: 'Dr. Michael Wong',
+            specialty: 'Pediatrics',
+            hospital: 'Children\'s Hospital',
+            email: 'drwong@example.com',
+            rating: 4.7,
+            location: 'San Francisco, CA',
+            image: '/placeholder.svg',
+            fee: '$120',
+            availability: ['Today', 'Tomorrow']
+          }
+        ];
+        setDoctors(sampleDoctors);
       } finally {
         setLoading(false);
       }
