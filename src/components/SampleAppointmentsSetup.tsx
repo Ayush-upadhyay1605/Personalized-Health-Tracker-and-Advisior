@@ -18,52 +18,73 @@ const SampleAppointmentsSetup = () => {
       
       // This is the mock data for our sample appointment
       const appointmentData = {
-        user_id: 'patient_user_id', // This will be updated in the function
         doctor_name: 'Dr. Sample',
         hospital: 'General Hospital',
         appointment_date: tomorrowDate.toISOString(),
         status: 'confirmed',
       };
       
-      // First, get the patient's user ID by email
-      const { data: patientData, error: patientError } = await supabase
-        .from('auth')
-        .select('id')
-        .eq('email', 'patient@example.com')
-        .single();
-        
-      if (patientError) {
-        // If we can't get the patient directly, let's try an alternative
-        // Create the appointment with a placeholder user ID
+      // Try to get the currently logged in user
+      const { data: sessionData } = await supabase.auth.getSession();
+      
+      if (sessionData.session?.user) {
+        // If a user is logged in, use their ID for the appointment
         const { error: insertError } = await supabase
           .from('appointments')
           .insert([{
             ...appointmentData,
-            user_id: '00000000-0000-0000-0000-000000000000', // Placeholder UUID
-          }]);
-          
-        if (insertError) throw insertError;
-        
-        toast({
-          title: "Sample appointment created",
-          description: "With placeholder user ID. Log in with both accounts to see it work properly.",
-          variant: "default",
-        });
-      } else {
-        // We found the patient, so use their actual user ID
-        const { error: insertError } = await supabase
-          .from('appointments')
-          .insert([{
-            ...appointmentData,
-            user_id: patientData.id,
+            user_id: sessionData.session.user.id,
           }]);
           
         if (insertError) throw insertError;
         
         toast({
           title: "Sample appointment created!",
-          description: `Appointment on ${format(tomorrowDate, 'PPP')} has been added to the database.`,
+          description: `Appointment on ${format(tomorrowDate, 'PPP')} has been added to the database for your account.`,
         });
+      } else {
+        // No user is logged in, create a generic appointment for demo purposes
+        // First, check for existing patient@example.com user
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          email: 'patient@example.com',
+          password: 'Password123',
+        });
+        
+        if (authError || !authData.user) {
+          // If we can't sign in as the sample patient, create with a placeholder ID
+          const { error: insertError } = await supabase
+            .from('appointments')
+            .insert([{
+              ...appointmentData,
+              user_id: '00000000-0000-0000-0000-000000000000', // Placeholder UUID
+            }]);
+            
+          if (insertError) throw insertError;
+          
+          toast({
+            title: "Sample appointment created",
+            description: "Created with placeholder ID. Create sample accounts first for better testing.",
+            variant: "default",
+          });
+        } else {
+          // We signed in as the sample patient, use their ID
+          const { error: insertError } = await supabase
+            .from('appointments')
+            .insert([{
+              ...appointmentData,
+              user_id: authData.user.id,
+            }]);
+          
+          if (insertError) throw insertError;
+          
+          // Sign out after creating the appointment
+          await supabase.auth.signOut();
+          
+          toast({
+            title: "Sample appointment created!",
+            description: `Appointment on ${format(tomorrowDate, 'PPP')} has been added for the sample patient.`,
+          });
+        }
       }
       
       setIsCreated(true);
