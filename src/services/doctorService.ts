@@ -5,11 +5,14 @@ import { Doctor } from '@/types/doctor';
 export const fetchDoctors = async (): Promise<Doctor[]> => {
   try {
     // Query all users with role=doctor from Supabase
-    const { data: { users }, error } = await supabase.auth.admin.listUsers();
+    const { data, error } = await supabase.auth.admin.listUsers();
     
     if (error) {
       throw error;
     }
+    
+    // Fix the TypeScript error by properly handling the users array
+    const users = data?.users || [];
     
     // Filter users with role 'doctor' and map to our Doctor interface
     const doctorUsers = users
