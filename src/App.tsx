@@ -17,6 +17,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import DashboardLayout from "./components/DashboardLayout";
 import Welcome from "./pages/Welcome";
+import DoctorDashboard from "./pages/DoctorDashboard";
 
 // Create a new QueryClient instance outside of component render
 const queryClient = new QueryClient({
@@ -38,6 +39,13 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Welcome />} />
             <Route path="/home" element={<Index />} />
+            
+            {/* Doctor Routes */}
+            <Route path="/doctor-dashboard" element={
+              <DashboardLayout>
+                <DoctorDashboard />
+              </DashboardLayout>
+            } />
             
             {/* Doctor Search and Booking Routes */}
             <Route path="/doctor-search" element={<DoctorSearch />} />
