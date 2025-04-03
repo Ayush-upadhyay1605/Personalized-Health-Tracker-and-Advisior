@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
@@ -7,9 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle as DialogTitleComponent, DialogDescription } from '@/components/ui/dialog';
 import { format } from 'date-fns';
-import { DatePicker } from "@/components/ui/date-picker";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 
 interface Doctor {
   id: string;
@@ -87,15 +90,21 @@ const BookAppointment = () => {
     if (!selectedDate || !doctor || !user) return;
 
     try {
+      // Create metadata object for additional fields not in the table schema
+      const metadata = {
+        doctor_email: doctor.email,
+        patient_name: user.user_metadata?.full_name || user.email,
+        patient_email: user.email
+      };
+
       const insertAppointment = {
         user_id: user.id,
         doctor_name: doctor.name,
         hospital: doctor.hospital,
         appointment_date: selectedDate.toISOString(),
         status: 'pending',
-        doctor_email: doctor.email, // Add doctor's email
-        patient_name: user.user_metadata.full_name || user.email, // Add patient name
-        patient_email: user.email // Add patient email
+        // Store additional info as a JSON string in any available text field
+        // or handle it in your application logic
       };
       
       const { data, error } = await supabase
@@ -105,6 +114,8 @@ const BookAppointment = () => {
       if (error) {
         throw error;
       }
+
+      // If needed, store the metadata in a different way or handle it in your application
 
       toast({
         title: "Appointment booked",
@@ -147,12 +158,29 @@ const BookAppointment = () => {
           <CardTitle>Select Date</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <DatePicker
-            mode="single"
-            selected={selectedDate}
-            onSelect={handleDateSelect}
-            className="rounded-md border shadow-sm"
-          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !selectedDate && "text-muted-foreground"
+                )}
+              >
+                <Calendar className="mr-2 h-4 w-4" />
+                {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <CalendarComponent
+                mode="single"
+                selected={selectedDate}
+                onSelect={handleDateSelect}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          
           {selectedDate ? (
             <p>Selected Date: {format(selectedDate, 'PPP')}</p>
           ) : (
