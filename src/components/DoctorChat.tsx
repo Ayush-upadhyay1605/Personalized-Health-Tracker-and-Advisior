@@ -13,13 +13,20 @@ interface Message {
 }
 
 interface DoctorChatProps {
-  doctorName: string;
-  doctorImage: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  doctorName?: string;
+  doctorImage?: string;
+  patientId?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-const DoctorChat = ({ doctorName, doctorImage, open, onOpenChange }: DoctorChatProps) => {
+const DoctorChat = ({ 
+  doctorName = "Dr. Smith", 
+  doctorImage = "/placeholder.svg", 
+  patientId, 
+  open = false, 
+  onOpenChange 
+}: DoctorChatProps) => {
   const { toast } = useToast();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([
@@ -32,6 +39,13 @@ const DoctorChat = ({ doctorName, doctorImage, open, onOpenChange }: DoctorChatP
   ]);
   
   const messageEndRef = useRef<HTMLDivElement>(null);
+
+  // Log patient ID for debugging
+  useEffect(() => {
+    if (patientId) {
+      console.log(`Chat initialized with patient ID: ${patientId}`);
+    }
+  }, [patientId]);
 
   // Scroll to bottom when messages change
   useEffect(() => {

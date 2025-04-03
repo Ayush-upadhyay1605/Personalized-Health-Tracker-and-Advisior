@@ -6,13 +6,20 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
 interface DoctorVideoCallProps {
-  doctorName: string;
-  doctorImage: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  doctorName?: string;
+  doctorImage?: string;
+  patientId?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-const DoctorVideoCall = ({ doctorName, doctorImage, open, onOpenChange }: DoctorVideoCallProps) => {
+const DoctorVideoCall = ({ 
+  doctorName = "Dr. Smith", 
+  doctorImage = "/placeholder.svg", 
+  patientId, 
+  open = false, 
+  onOpenChange 
+}: DoctorVideoCallProps) => {
   const { toast } = useToast();
   const [isConnecting, setIsConnecting] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
@@ -22,6 +29,13 @@ const DoctorVideoCall = ({ doctorName, doctorImage, open, onOpenChange }: Doctor
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
+
+  // Log patient ID for debugging
+  useEffect(() => {
+    if (patientId) {
+      console.log(`Video call initialized with patient ID: ${patientId}`);
+    }
+  }, [patientId]);
 
   useEffect(() => {
     if (open) {
@@ -80,7 +94,7 @@ const DoctorVideoCall = ({ doctorName, doctorImage, open, onOpenChange }: Doctor
         description: "Could not access camera or microphone",
         variant: "destructive",
       });
-      onOpenChange(false);
+      onOpenChange?.(false);
     }
   };
 
@@ -131,7 +145,7 @@ const DoctorVideoCall = ({ doctorName, doctorImage, open, onOpenChange }: Doctor
       title: "Call ended",
       description: `Call with ${doctorName} has ended`,
     });
-    onOpenChange(false);
+    onOpenChange?.(false);
   };
 
   return (

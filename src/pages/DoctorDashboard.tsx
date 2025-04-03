@@ -148,7 +148,13 @@ const DoctorDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <DoctorChat patientId={selectedAppointment.user_id} />
+            <DoctorChat 
+              patientId={selectedAppointment.user_id} 
+              doctorName={user?.user_metadata?.full_name || "Doctor"}
+              doctorImage="/placeholder.svg"
+              open={true}
+              onOpenChange={() => endCommunication()}
+            />
           </CardContent>
         </Card>
       );
@@ -162,7 +168,13 @@ const DoctorDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <DoctorVideoCall patientId={selectedAppointment.user_id} />
+            <DoctorVideoCall 
+              patientId={selectedAppointment.user_id}
+              doctorName={user?.user_metadata?.full_name || "Doctor"}
+              doctorImage="/placeholder.svg"
+              open={true}
+              onOpenChange={() => endCommunication()}
+            />
           </CardContent>
         </Card>
       );
