@@ -149,7 +149,7 @@ const DoctorSearch = () => {
                   <SelectValue placeholder="Any specialty" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any specialty</SelectItem>
+                  <SelectItem value="all">Any specialty</SelectItem>
                   {specialties.map((s) => (
                     <SelectItem key={s} value={s}>{s}</SelectItem>
                   ))}
@@ -164,7 +164,7 @@ const DoctorSearch = () => {
                   <SelectValue placeholder="Any location" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any location</SelectItem>
+                  <SelectItem value="all">Any location</SelectItem>
                   {locations.map((l) => (
                     <SelectItem key={l} value={l}>{l}</SelectItem>
                   ))}
