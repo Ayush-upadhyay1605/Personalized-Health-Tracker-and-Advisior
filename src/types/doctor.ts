@@ -10,4 +10,19 @@ export interface Doctor {
   image?: string;
   fee?: string;
   availability?: string[];
+  consultationTypes?: {
+    video?: {
+      available: boolean;
+      fee: string;
+    };
+    chat?: {
+      available: boolean;
+      fee: string;
+    };
+    inPerson?: {
+      available: boolean;
+      fee: string;
+    };
+  };
+  bio?: string;
 }
