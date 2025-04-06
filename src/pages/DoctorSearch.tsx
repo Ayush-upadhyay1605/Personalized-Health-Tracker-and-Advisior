@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -30,10 +29,20 @@ const mapContainerStyle = {
   borderRadius: '0.5rem'
 };
 
-// Center on US by default
+// Center on India by default
 const defaultCenter = {
-  lat: 37.7749,
-  lng: -122.4194
+  lat: 20.5937,
+  lng: 78.9629
+};
+
+// Function to convert dollar amount to rupees (75 INR = 1 USD)
+const convertToRupees = (dollarAmount: string): string => {
+  // Extract numeric value from string (e.g., "$150" -> 150)
+  const numericValue = parseInt(dollarAmount.replace(/[^0-9]/g, ''), 10);
+  // Convert to rupees (1 USD = 75 INR)
+  const rupeesValue = numericValue * 75;
+  // Return formatted rupee amount
+  return `₹${rupeesValue}`;
 };
 
 const DoctorSearch = () => {
@@ -51,202 +60,202 @@ const DoctorSearch = () => {
   const [selectedMapDoctor, setSelectedMapDoctor] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
 
-  // Base doctor data
+  // Base doctor data with locations in India
   const baseDoctors = [
     {
       id: 1,
       name: 'Dr. Sarah Johnson',
       specialty: 'Cardiologist',
       experience: '15 years',
-      location: "Central Hospital, New York",
+      location: "Apollo Hospital, Mumbai",
       rating: 4.8,
       reviews: 127,
       fee: '$150',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 40.7128, lng: -74.0060 }
+      coordinates: { lat: 19.0760, lng: 72.8777 }
     },
     {
       id: 2,
       name: 'Dr. Michael Brown',
       specialty: 'Dermatologist',
       experience: '12 years',
-      location: "SkinCare Clinic, Los Angeles",
+      location: "SkinCare Clinic, Delhi",
       rating: 4.6,
       reviews: 95,
       fee: '$130',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 34.0522, lng: -118.2437 }
+      coordinates: { lat: 28.6139, lng: 77.2090 }
     },
     {
       id: 3,
       name: 'Dr. Emily Davis',
       specialty: 'Gynecologist',
       experience: '10 years',
-      location: "Women's Health Center, Chicago",
+      location: "Women's Health Center, Chennai",
       rating: 4.7,
       reviews: 110,
       fee: '$140',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1588173454394-29842817ae78?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 41.8781, lng: -87.6298 }
+      coordinates: { lat: 13.0826, lng: 80.2707 }
     },
     {
       id: 4,
       name: 'Dr. David Wilson',
       specialty: 'Pediatrician',
       experience: '8 years',
-      location: "Children's Hospital, Houston",
+      location: "Children's Hospital, Kolkata",
       rating: 4.9,
       reviews: 142,
       fee: '$120',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1628592737646-999419db23c5?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 29.7604, lng: -95.3698 }
+      coordinates: { lat: 22.5726, lng: 88.3639 }
     },
     {
       id: 5,
       name: 'Dr. Jennifer Garcia',
       specialty: 'Orthopedic',
       experience: '14 years',
-      location: "Orthopedic Clinic, Miami",
+      location: "Orthopedic Clinic, Hyderabad",
       rating: 4.5,
       reviews: 88,
       fee: '$160',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1591604029549-92755189876a?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 25.7617, lng: -80.1918 }
+      coordinates: { lat: 17.3850, lng: 78.4867 }
     },
     {
       id: 6,
       name: 'Dr. Robert Martinez',
       specialty: 'Neurologist',
       experience: '11 years',
-      location: "NeuroCare Center, San Francisco",
+      location: "NeuroCare Center, Bangalore",
       rating: 4.7,
       reviews: 105,
       fee: '$150',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1505751172876-9aba583c2bf6?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 37.7749, lng: -122.4194 }
+      coordinates: { lat: 12.9716, lng: 77.5946 }
     },
     {
       id: 7,
       name: 'Dr. Linda Anderson',
       specialty: 'Cardiologist',
       experience: '9 years',
-      location: "Heart Health Clinic, Boston",
+      location: "Heart Health Clinic, Pune",
       rating: 4.6,
       reviews: 92,
       fee: '$140',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1532938314630-e96f17bb43e3?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 42.3601, lng: -71.0589 }
+      coordinates: { lat: 18.5204, lng: 73.8567 }
     },
     {
       id: 8,
       name: 'Dr. Christopher Thomas',
       specialty: 'Ophthalmologist',
       experience: '13 years',
-      location: "EyeCare Institute, Philadelphia",
+      location: "EyeCare Institute, Hyderabad",
       rating: 4.8,
       reviews: 120,
       fee: '$130',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1583324113626-70df0f4deaab?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 39.9526, lng: -75.1652 }
+      coordinates: { lat: 17.3850, lng: 78.4867 }
     },
     {
       id: 9,
       name: 'Dr. Angela Jackson',
       specialty: 'Psychiatrist',
       experience: '10 years',
-      location: "Mental Health Clinic, Seattle",
+      location: "Mental Health Clinic, Bangalore",
       rating: 4.7,
       reviews: 108,
       fee: '$120',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1628890923662-2cb23c2e3cfe?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 47.6062, lng: -122.3321 }
+      coordinates: { lat: 12.9716, lng: 77.5946 }
     },
     {
       id: 10,
       name: 'Dr. Patrick White',
       specialty: 'Endocrinologist',
       experience: '12 years',
-      location: "Diabetes & Hormone Center, Denver",
+      location: "Diabetes & Hormone Center, Mumbai",
       rating: 4.9,
       reviews: 135,
       fee: '$140',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1537368910025-703dfdb6a5de?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 39.7392, lng: -104.9903 }
+      coordinates: { lat: 19.0760, lng: 72.8777 }
     },
     {
       id: 11,
       name: 'Dr. Theresa Hall',
       specialty: 'Allergist',
       experience: '8 years',
-      location: "Allergy & Asthma Clinic, Atlanta",
+      location: "Allergy & Asthma Clinic, Delhi",
       rating: 4.6,
       reviews: 85,
       fee: '$130',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1532938314630-e96f17bb43e3?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 33.7490, lng: -84.3880 }
+      coordinates: { lat: 28.6139, lng: 77.2090 }
     },
     {
       id: 12,
       name: 'Dr. Kevin Hill',
       specialty: 'Urologist',
       experience: '14 years',
-      location: "Urology Associates, Phoenix",
+      location: "Urology Associates, Chennai",
       rating: 4.7,
       reviews: 112,
       fee: '$150',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1505751172876-9aba583c2bf6?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 33.4484, lng: -112.0740 }
+      coordinates: { lat: 13.0826, lng: 80.2707 }
     },
     {
       id: 13,
       name: 'Dr. Barbara Wright',
       specialty: 'Oncologist',
       experience: '11 years',
-      location: "Cancer Treatment Center, Baltimore",
+      location: "Cancer Treatment Center, Bangalore",
       rating: 4.8,
       reviews: 128,
       fee: '$160',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1591604029549-92755189876a?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 39.2904, lng: -76.6122 }
+      coordinates: { lat: 12.9716, lng: 77.5946 }
     },
     {
       id: 14,
       name: 'Dr. Samuel Green',
       specialty: 'Rheumatologist',
       experience: '9 years',
-      location: "Arthritis & Joint Clinic, Orlando",
+      location: "Arthritis & Joint Clinic, Pune",
       rating: 4.5,
       reviews: 90,
       fee: '$140',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1583324113626-70df0f4deaab?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 28.5383, lng: -81.3792 }
+      coordinates: { lat: 18.5204, lng: 73.8567 }
     },
     {
       id: 15,
       name: 'Dr. Ruth Carter',
       specialty: 'Hematologist',
       experience: '13 years',
-      location: "Blood Disorder Center, San Antonio",
+      location: "Blood Disorder Center, Mumbai",
       rating: 4.9,
       reviews: 145,
       fee: '$150',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1537368910025-703dfdb6a5de?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 29.4241, lng: -98.4936 }
+      coordinates: { lat: 19.0760, lng: 72.8777 }
     }
   ];
 
@@ -454,6 +463,9 @@ const DoctorSearch = () => {
         doctor.coordinates.lng
       ).toFixed(1)} km away` : '';
 
+    // Convert fee from dollars to rupees
+    const feeInRupees = convertToRupees(doctor.fee);
+
     return (
       <Card key={doctor.id} className="overflow-hidden">
         <CardContent className="p-0">
@@ -503,7 +515,7 @@ const DoctorSearch = () => {
               </div>
               <div className="flex justify-between items-center mt-4">
                 <div>
-                  <span className="text-lg font-medium text-gray-900">{doctor.fee}</span>
+                  <span className="text-lg font-medium text-gray-900">{feeInRupees}</span>
                   <span className="text-sm text-gray-500 ml-1">consultation fee</span>
                 </div>
                 <Button 
@@ -520,67 +532,74 @@ const DoctorSearch = () => {
     );
   };
 
-  const OnlineDoctorCard = ({ doctor }) => (
-    <Card key={`online-${doctor.id}`} className="overflow-hidden">
-      <CardContent className="p-0">
-        <div className="flex flex-col md:flex-row">
-          <div className="w-full md:w-1/4 bg-gray-100">
-            <img
-              src={doctor.image}
-              alt={doctor.name}
-              className="w-full h-40 md:h-full object-cover"
-            />
-          </div>
-          <div className="flex-1 p-4">
-            <div className="flex justify-between">
-              <div>
-                <h3 className="text-lg font-medium text-gray-900">{doctor.name}</h3>
-                <p className="text-sm text-gray-500">{doctor.specialty}</p>
-                <div className="flex items-center mt-1">
-                  <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                  <span className="ml-1 text-sm font-medium">{doctor.rating}</span>
-                  <span className="ml-1 text-sm text-gray-500">({doctor.reviews} reviews)</span>
+  const OnlineDoctorCard = ({ doctor }) => {
+    // Convert fee from dollars to rupees (with a discount for online)
+    const dollarFee = parseInt(doctor.fee.substring(1));
+    const discountedDollarFee = dollarFee - 30;
+    const feeInRupees = `₹${discountedDollarFee * 75}`;
+
+    return (
+      <Card key={`online-${doctor.id}`} className="overflow-hidden">
+        <CardContent className="p-0">
+          <div className="flex flex-col md:flex-row">
+            <div className="w-full md:w-1/4 bg-gray-100">
+              <img
+                src={doctor.image}
+                alt={doctor.name}
+                className="w-full h-40 md:h-full object-cover"
+              />
+            </div>
+            <div className="flex-1 p-4">
+              <div className="flex justify-between">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">{doctor.name}</h3>
+                  <p className="text-sm text-gray-500">{doctor.specialty}</p>
+                  <div className="flex items-center mt-1">
+                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                    <span className="ml-1 text-sm font-medium">{doctor.rating}</span>
+                    <span className="ml-1 text-sm text-gray-500">({doctor.reviews} reviews)</span>
+                  </div>
+                </div>
+                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center">
+                  <Clock className="h-3 w-3 mr-1" />
+                  Online Now
+                </span>
+              </div>
+              <div className="mt-2">
+                <div className="flex items-center mt-1 text-sm text-gray-500">
+                  <Calendar className="h-4 w-4 text-gray-400 mr-1" />
+                  <span>{doctor.experience} experience</span>
                 </div>
               </div>
-              <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center">
-                <Clock className="h-3 w-3 mr-1" />
-                Online Now
-              </span>
-            </div>
-            <div className="mt-2">
-              <div className="flex items-center mt-1 text-sm text-gray-500">
-                <Calendar className="h-4 w-4 text-gray-400 mr-1" />
-                <span>{doctor.experience} experience</span>
-              </div>
-            </div>
-            <div className="flex justify-between items-center mt-4">
-              <div>
-                <span className="text-lg font-medium text-gray-900">${parseInt(doctor.fee.substring(1)) - 30}</span>
-                <span className="text-sm text-gray-500 ml-1">video consultation</span>
-              </div>
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline"
-                  className="border-health-primary text-health-primary hover:bg-health-primary/10"
-                  onClick={() => handleChat(doctor)}
-                >
-                  <MessageSquare className="h-4 w-4 mr-1" />
-                  Chat Now
-                </Button>
-                <Button 
-                  className="bg-health-primary hover:bg-health-primary/90"
-                  onClick={() => handleVideoCall(doctor)}
-                >
-                  <Video className="h-4 w-4 mr-1" />
-                  Video Call
-                </Button>
+              <div className="flex justify-between items-center mt-4">
+                <div>
+                  <span className="text-lg font-medium text-gray-900">{feeInRupees}</span>
+                  <span className="text-sm text-gray-500 ml-1">video consultation</span>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline"
+                    className="border-health-primary text-health-primary hover:bg-health-primary/10"
+                    onClick={() => handleChat(doctor)}
+                  >
+                    <MessageSquare className="h-4 w-4 mr-1" />
+                    Chat Now
+                  </Button>
+                  <Button 
+                    className="bg-health-primary hover:bg-health-primary/90"
+                    onClick={() => handleVideoCall(doctor)}
+                  >
+                    <Video className="h-4 w-4 mr-1" />
+                    Video Call
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
+        </CardContent>
+      </Card>
+    );
+  };
 
   const renderMapSection = () => {
     if (loadError) {
@@ -723,7 +742,6 @@ const DoctorSearch = () => {
     );
   };
 
-  // Modified return statement to show the number of doctors available
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
