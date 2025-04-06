@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -763,4 +764,106 @@ const DoctorSearch = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6
+      <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        {/* Specialty filter */}
+        <div className="mb-6 overflow-x-auto pb-2">
+          <div className="flex space-x-2">
+            {specialties.map(specialty => (
+              <Button
+                key={specialty}
+                variant={selectedSpecialty === specialty ? "default" : "outline"}
+                className={`rounded-full ${
+                  selectedSpecialty === specialty
+                    ? "bg-health-primary text-white"
+                    : "border-gray-300 text-gray-700"
+                } whitespace-nowrap`}
+                onClick={() => setSelectedSpecialty(specialty)}
+              >
+                {specialty}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Main content tabs */}
+        <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange}>
+          <TabsList className="mb-6">
+            <TabsTrigger value="all">All Doctors</TabsTrigger>
+            <TabsTrigger value="nearby">Nearby</TabsTrigger>
+            <TabsTrigger value="online">Online Consultation</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="all" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-medium text-gray-900">Available Doctors</h2>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                Sort by
+              </Button>
+            </div>
+            
+            <div className="space-y-4">
+              {getFilteredDoctors().length > 0 ? (
+                getFilteredDoctors().map(doctor => (
+                  <DoctorCard key={doctor.id} doctor={doctor} />
+                ))
+              ) : (
+                <div className="text-center py-12">
+                  <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No doctors found</h3>
+                  <p className="text-gray-500">Try adjusting your search criteria</p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="nearby" className="space-y-6">
+            {renderMapSection()}
+          </TabsContent>
+          
+          <TabsContent value="online" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-medium text-gray-900">Online Consultation</h2>
+              <div className="flex items-center text-sm text-gray-500">
+                <Clock className="h-4 w-4 mr-1 text-green-500" />
+                <span>Available now</span>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              {getOnlineDoctors().length > 0 ? (
+                getOnlineDoctors().map(doctor => (
+                  <OnlineDoctorCard key={`online-${doctor.id}`} doctor={doctor} />
+                ))
+              ) : (
+                <div className="text-center py-12">
+                  <Video className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No online doctors available</h3>
+                  <p className="text-gray-500">Check back later or try a different specialty</p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </main>
+      
+      {isVideoCallOpen && selectedDoctor && (
+        <DoctorVideoCall 
+          doctor={selectedDoctor} 
+          isOpen={isVideoCallOpen}
+          setIsOpen={setIsVideoCallOpen}
+        />
+      )}
+      
+      {isChatOpen && selectedDoctor && (
+        <DoctorChat 
+          doctor={selectedDoctor}
+          isOpen={isChatOpen}
+          setIsOpen={setIsChatOpen}
+        />
+      )}
+    </div>
+  );
+};
+
+export default DoctorSearch;
