@@ -1,8 +1,23 @@
+
 #root {
-  max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+}
+
+.responsive-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .logo {
@@ -39,4 +54,52 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Mobile-first responsive styles */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  h2 {
+    font-size: 1.25rem !important;
+  }
+  
+  .hidden-mobile {
+    display: none !important;
+  }
+}
+
+/* Ensure proper viewport sizing on all devices */
+@media screen and (max-width: 767px) {
+  input, select, textarea, button {
+    font-size: 16px !important; /* Prevents zoom on focus in iOS */
+  }
+}
+
+/* Better spacing for mobile */
+@media (max-width: 767px) {
+  .py-16 {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+  
+  .px-6 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  .gap-8 {
+    gap: 1rem !important;
+  }
+  
+  .mb-6 {
+    margin-bottom: 1rem !important;
+  }
 }

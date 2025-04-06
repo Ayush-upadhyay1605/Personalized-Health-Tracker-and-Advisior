@@ -41,22 +41,22 @@ const Index = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="py-16 md:py-24 px-6 md:px-12 max-w-7xl mx-auto">
+      <section className="py-8 md:py-16 px-4 md:px-12 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto animate-fade-in">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 text-gray-900">
             Your Personal Health Companion
           </h1>
-          <p className="text-xl text-gray-600 mb-10">
+          <p className="text-lg md:text-xl text-gray-600 mb-6 md:mb-10">
             Choose how you'd like to take care of your health today
           </p>
         </div>
         
         {/* Feature Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mt-12 max-w-5xl mx-auto animate-fade-in-up">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-8 mt-8 md:mt-12 max-w-5xl mx-auto animate-fade-in-up">
           <FeatureCard
             icon={
               <div className="feature-icon-bg bg-health-primary/10">
-                <Calendar className="h-8 w-8 text-health-primary" />
+                <Calendar className="h-6 w-6 md:h-8 md:w-8 text-health-primary" />
               </div>
             }
             title="Book Doctor Appointment"
@@ -69,7 +69,7 @@ const Index = () => {
           <FeatureCard
             icon={
               <div className="feature-icon-bg bg-health-secondary/10">
-                <Activity className="h-8 w-8 text-health-secondary" />
+                <Activity className="h-6 w-6 md:h-8 md:w-8 text-health-secondary" />
               </div>
             }
             title="Track Your Fitness"
@@ -82,26 +82,26 @@ const Index = () => {
       </section>
       
       {/* Why Choose Section */}
-      <section className="py-16 md:py-24 px-6 md:px-12 max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-16">Why Choose HealthHub?</h2>
+      <section className="py-8 md:py-16 px-4 md:px-12 max-w-7xl mx-auto">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-16">Why Choose HealthHub?</h2>
         
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto">
           <FeatureItem
-            icon={<Calendar className="h-8 w-8 text-health-primary" />}
+            icon={<Calendar className="h-6 w-6 md:h-8 md:w-8 text-health-primary" />}
             title="Easy Scheduling"
             description="Book appointments with just a few clicks"
             bgColor="bg-health-primary/10"
           />
           
           <FeatureItem
-            icon={<Activity className="h-8 w-8 text-health-secondary" />}
+            icon={<Activity className="h-6 w-6 md:h-8 md:w-8 text-health-secondary" />}
             title="Health Tracking"
             description="Monitor your vital signs and daily activities"
             bgColor="bg-health-secondary/10"
           />
           
           <FeatureItem
-            icon={<Users className="h-8 w-8 text-blue-500" />}
+            icon={<Users className="h-6 w-6 md:h-8 md:w-8 text-blue-500" />}
             title="Expert Care"
             description="Connect with qualified healthcare providers"
             bgColor="bg-blue-100"
@@ -110,14 +110,14 @@ const Index = () => {
       </section>
       
       {/* Call to Action */}
-      <section className="py-16 bg-gradient-to-r from-health-primary/5 to-health-secondary/5">
-        <div className="max-w-3xl mx-auto text-center px-6">
-          <h2 className="text-2xl md:text-3xl font-bold mb-6">Ready to take control of your health?</h2>
-          <p className="text-gray-600 mb-8">
+      <section className="py-8 md:py-16 bg-gradient-to-r from-health-primary/5 to-health-secondary/5">
+        <div className="max-w-3xl mx-auto text-center px-4 md:px-6">
+          <h2 className="text-xl md:text-3xl font-bold mb-4 md:mb-6">Ready to take control of your health?</h2>
+          <p className="text-gray-600 mb-6 md:mb-8">
             Join thousands of users who've improved their health with HealthHub.
           </p>
           <button 
-            className="bg-health-primary text-white py-3 px-8 rounded-lg hover:bg-health-primary/90 transition-all duration-300 shadow-sm hover:shadow"
+            className="bg-health-primary text-white py-2 md:py-3 px-6 md:px-8 rounded-lg hover:bg-health-primary/90 transition-all duration-300 shadow-sm hover:shadow"
             onClick={handleDashboardClick}
           >
             Get Started Today
