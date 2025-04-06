@@ -35,12 +35,16 @@ const defaultCenter = {
   lng: 78.9629
 };
 
-// Function to convert dollar amount to rupees (75 INR = 1 USD)
+// Function to convert dollar amount to rupees no longer needed since we're using direct rupee values
+// Keeping it just in case it's needed for backward compatibility
 const convertToRupees = (dollarAmount: string): string => {
+  // Return the value directly if it's already in rupees
+  if (dollarAmount.startsWith('₹')) return dollarAmount;
+  
   // Extract numeric value from string (e.g., "$150" -> 150)
   const numericValue = parseInt(dollarAmount.replace(/[^0-9]/g, ''), 10);
-  // Convert to rupees (1 USD = 75 INR)
-  const rupeesValue = numericValue * 75;
+  // Convert to rupees (much lower value to reflect Indian standards)
+  const rupeesValue = numericValue * 8; // Significantly reduced conversion rate
   // Return formatted rupee amount
   return `₹${rupeesValue}`;
 };
@@ -60,7 +64,7 @@ const DoctorSearch = () => {
   const [selectedMapDoctor, setSelectedMapDoctor] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
 
-  // Base doctor data with locations in India
+  // Base doctor data with locations in India and updated fees
   const baseDoctors = [
     {
       id: 1,
@@ -70,7 +74,7 @@ const DoctorSearch = () => {
       location: "Apollo Hospital, Mumbai",
       rating: 4.8,
       reviews: 127,
-      fee: '$150',
+      fee: '₹1200',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 19.0760, lng: 72.8777 }
@@ -83,7 +87,7 @@ const DoctorSearch = () => {
       location: "SkinCare Clinic, Delhi",
       rating: 4.6,
       reviews: 95,
-      fee: '$130',
+      fee: '₹900',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 28.6139, lng: 77.2090 }
@@ -96,7 +100,7 @@ const DoctorSearch = () => {
       location: "Women's Health Center, Chennai",
       rating: 4.7,
       reviews: 110,
-      fee: '$140',
+      fee: '₹950',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1588173454394-29842817ae78?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 13.0826, lng: 80.2707 }
@@ -109,7 +113,7 @@ const DoctorSearch = () => {
       location: "Children's Hospital, Kolkata",
       rating: 4.9,
       reviews: 142,
-      fee: '$120',
+      fee: '₹800',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1628592737646-999419db23c5?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 22.5726, lng: 88.3639 }
@@ -122,7 +126,7 @@ const DoctorSearch = () => {
       location: "Orthopedic Clinic, Hyderabad",
       rating: 4.5,
       reviews: 88,
-      fee: '$160',
+      fee: '₹1100',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1591604029549-92755189876a?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 17.3850, lng: 78.4867 }
@@ -135,7 +139,7 @@ const DoctorSearch = () => {
       location: "NeuroCare Center, Bangalore",
       rating: 4.7,
       reviews: 105,
-      fee: '$150',
+      fee: '₹1000',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1505751172876-9aba583c2bf6?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 12.9716, lng: 77.5946 }
@@ -148,7 +152,7 @@ const DoctorSearch = () => {
       location: "Heart Health Clinic, Pune",
       rating: 4.6,
       reviews: 92,
-      fee: '$140',
+      fee: '₹950',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1532938314630-e96f17bb43e3?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 18.5204, lng: 73.8567 }
@@ -161,7 +165,7 @@ const DoctorSearch = () => {
       location: "EyeCare Institute, Hyderabad",
       rating: 4.8,
       reviews: 120,
-      fee: '$130',
+      fee: '₹900',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1583324113626-70df0f4deaab?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 17.3850, lng: 78.4867 }
@@ -174,7 +178,7 @@ const DoctorSearch = () => {
       location: "Mental Health Clinic, Bangalore",
       rating: 4.7,
       reviews: 108,
-      fee: '$120',
+      fee: '₹850',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1628890923662-2cb23c2e3cfe?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 12.9716, lng: 77.5946 }
@@ -187,7 +191,7 @@ const DoctorSearch = () => {
       location: "Diabetes & Hormone Center, Mumbai",
       rating: 4.9,
       reviews: 135,
-      fee: '$140',
+      fee: '₹950',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1537368910025-703dfdb6a5de?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 19.0760, lng: 72.8777 }
@@ -200,7 +204,7 @@ const DoctorSearch = () => {
       location: "Allergy & Asthma Clinic, Delhi",
       rating: 4.6,
       reviews: 85,
-      fee: '$130',
+      fee: '₹850',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1532938314630-e96f17bb43e3?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 28.6139, lng: 77.2090 }
@@ -213,7 +217,7 @@ const DoctorSearch = () => {
       location: "Urology Associates, Chennai",
       rating: 4.7,
       reviews: 112,
-      fee: '$150',
+      fee: '₹1000',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1505751172876-9aba583c2bf6?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 13.0826, lng: 80.2707 }
@@ -226,7 +230,7 @@ const DoctorSearch = () => {
       location: "Cancer Treatment Center, Bangalore",
       rating: 4.8,
       reviews: 128,
-      fee: '$160',
+      fee: '₹1100',
       availableToday: false,
       image: 'https://images.unsplash.com/photo-1591604029549-92755189876a?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 12.9716, lng: 77.5946 }
@@ -239,7 +243,7 @@ const DoctorSearch = () => {
       location: "Arthritis & Joint Clinic, Pune",
       rating: 4.5,
       reviews: 90,
-      fee: '$140',
+      fee: '₹950',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1583324113626-70df0f4deaab?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 18.5204, lng: 73.8567 }
@@ -252,7 +256,7 @@ const DoctorSearch = () => {
       location: "Blood Disorder Center, Mumbai",
       rating: 4.9,
       reviews: 145,
-      fee: '$150',
+      fee: '₹1000',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1537368910025-703dfdb6a5de?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 19.0760, lng: 72.8777 }
@@ -533,10 +537,13 @@ const DoctorSearch = () => {
   };
 
   const OnlineDoctorCard = ({ doctor }) => {
-    // Convert fee from dollars to rupees (with a discount for online)
-    const dollarFee = parseInt(doctor.fee.substring(1));
-    const discountedDollarFee = dollarFee - 30;
-    const feeInRupees = `₹${discountedDollarFee * 75}`;
+    // Apply a 20% discount for online consultations from the regular fee
+    const fee = doctor.fee;
+    // Remove the ₹ symbol and convert to number
+    const feeNumber = parseInt(fee.replace('₹', ''), 10);
+    // Apply 20% discount
+    const discountedFee = Math.round(feeNumber * 0.8);
+    const discountedFeeFormatted = `₹${discountedFee}`;
 
     return (
       <Card key={`online-${doctor.id}`} className="overflow-hidden">
@@ -573,7 +580,7 @@ const DoctorSearch = () => {
               </div>
               <div className="flex justify-between items-center mt-4">
                 <div>
-                  <span className="text-lg font-medium text-gray-900">{feeInRupees}</span>
+                  <span className="text-lg font-medium text-gray-900">{discountedFeeFormatted}</span>
                   <span className="text-sm text-gray-500 ml-1">video consultation</span>
                 </div>
                 <div className="flex gap-2">

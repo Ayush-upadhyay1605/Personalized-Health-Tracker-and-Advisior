@@ -9,7 +9,7 @@ export const additionalDoctors = [
     location: 'AIIMS Brain Center, Bangalore',
     rating: 4.7,
     reviews: 118,
-    fee: '$190',
+    fee: '₹1200',
     availableToday: true,
     image: 'https://images.unsplash.com/photo-1622902046580-2b47f47f5471?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 12.9716, lng: 77.5946 } // Bangalore
@@ -22,7 +22,7 @@ export const additionalDoctors = [
     location: 'Skin Health Clinic, Chennai',
     rating: 4.5,
     reviews: 92,
-    fee: '$160',
+    fee: '₹1000',
     availableToday: false,
     image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 13.0827, lng: 80.2707 } // Chennai
@@ -35,7 +35,7 @@ export const additionalDoctors = [
     location: 'Heart & Vascular Institute, Hyderabad',
     rating: 4.9,
     reviews: 231,
-    fee: '$210',
+    fee: '₹1500',
     availableToday: true,
     image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 17.3850, lng: 78.4867 } // Hyderabad
@@ -48,7 +48,7 @@ export const additionalDoctors = [
     location: 'Mental Wellness Center, Kolkata',
     rating: 4.8,
     reviews: 104,
-    fee: '$180',
+    fee: '₹1200',
     availableToday: false,
     image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 22.5726, lng: 88.3639 } // Kolkata
@@ -61,7 +61,7 @@ export const additionalDoctors = [
     location: 'Sports Medicine & Orthopedics, Pune',
     rating: 4.7,
     reviews: 138,
-    fee: '$195',
+    fee: '₹1300',
     availableToday: true,
     image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 18.5204, lng: 73.8567 } // Pune
@@ -74,7 +74,7 @@ export const additionalDoctors = [
     location: 'Diabetes & Hormone Center, Ahmedabad',
     rating: 4.6,
     reviews: 87,
-    fee: '$170',
+    fee: '₹1100',
     availableToday: true,
     image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 23.0225, lng: 72.5714 } // Ahmedabad
@@ -87,7 +87,7 @@ export const additionalDoctors = [
     location: 'Vision Care Institute, Jaipur',
     rating: 4.9,
     reviews: 189,
-    fee: '$165',
+    fee: '₹1000',
     availableToday: false,
     image: 'https://images.unsplash.com/photo-1622902046580-2b47f47f5471?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 26.9124, lng: 75.7873 } // Jaipur
@@ -100,7 +100,7 @@ export const additionalDoctors = [
     location: "Children's Health Center, Lucknow",
     rating: 4.8,
     reviews: 152,
-    fee: '$140',
+    fee: '₹900',
     availableToday: true,
     image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 26.8467, lng: 80.9462 } // Lucknow
@@ -113,7 +113,7 @@ export const additionalDoctors = [
     location: 'Allergy & Asthma Specialists, Bhopal',
     rating: 4.5,
     reviews: 76,
-    fee: '$155',
+    fee: '₹950',
     availableToday: false,
     image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 23.2599, lng: 77.4126 } // Bhopal
@@ -126,7 +126,7 @@ export const additionalDoctors = [
     location: 'Arthritis Treatment Center, Chandigarh',
     rating: 4.7,
     reviews: 124,
-    fee: '$185',
+    fee: '₹1100',
     availableToday: true,
     image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 30.7333, lng: 76.7794 } // Chandigarh
