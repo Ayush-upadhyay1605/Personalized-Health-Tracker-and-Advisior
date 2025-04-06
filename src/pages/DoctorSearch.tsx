@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -64,11 +65,11 @@ const DoctorSearch = () => {
   const [selectedMapDoctor, setSelectedMapDoctor] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
 
-  // Base doctor data with locations in India and updated fees
+  // Base doctor data with Indian names, locations in India and updated fees
   const baseDoctors = [
     {
       id: 1,
-      name: 'Dr. Sarah Johnson',
+      name: 'Dr. Neha Sharma',
       specialty: 'Cardiologist',
       experience: '15 years',
       location: "Apollo Hospital, Mumbai",
@@ -81,7 +82,7 @@ const DoctorSearch = () => {
     },
     {
       id: 2,
-      name: 'Dr. Michael Brown',
+      name: 'Dr. Amit Patel',
       specialty: 'Dermatologist',
       experience: '12 years',
       location: "SkinCare Clinic, Delhi",
@@ -94,7 +95,7 @@ const DoctorSearch = () => {
     },
     {
       id: 3,
-      name: 'Dr. Emily Davis',
+      name: 'Dr. Deepa Gupta',
       specialty: 'Gynecologist',
       experience: '10 years',
       location: "Women's Health Center, Chennai",
@@ -107,7 +108,7 @@ const DoctorSearch = () => {
     },
     {
       id: 4,
-      name: 'Dr. David Wilson',
+      name: 'Dr. Vivek Agarwal',
       specialty: 'Pediatrician',
       experience: '8 years',
       location: "Children's Hospital, Kolkata",
@@ -120,7 +121,7 @@ const DoctorSearch = () => {
     },
     {
       id: 5,
-      name: 'Dr. Jennifer Garcia',
+      name: 'Dr. Kavita Reddy',
       specialty: 'Orthopedic',
       experience: '14 years',
       location: "Orthopedic Clinic, Hyderabad",
@@ -133,7 +134,7 @@ const DoctorSearch = () => {
     },
     {
       id: 6,
-      name: 'Dr. Robert Martinez',
+      name: 'Dr. Rahul Mehta',
       specialty: 'Neurologist',
       experience: '11 years',
       location: "NeuroCare Center, Bangalore",
@@ -146,7 +147,7 @@ const DoctorSearch = () => {
     },
     {
       id: 7,
-      name: 'Dr. Linda Anderson',
+      name: 'Dr. Pooja Desai',
       specialty: 'Cardiologist',
       experience: '9 years',
       location: "Heart Health Clinic, Pune",
@@ -159,7 +160,7 @@ const DoctorSearch = () => {
     },
     {
       id: 8,
-      name: 'Dr. Christopher Thomas',
+      name: 'Dr. Rohan Singhania',
       specialty: 'Ophthalmologist',
       experience: '13 years',
       location: "EyeCare Institute, Hyderabad",
@@ -172,7 +173,7 @@ const DoctorSearch = () => {
     },
     {
       id: 9,
-      name: 'Dr. Angela Jackson',
+      name: 'Dr. Ananya Iyer',
       specialty: 'Psychiatrist',
       experience: '10 years',
       location: "Mental Health Clinic, Bangalore",
@@ -185,7 +186,7 @@ const DoctorSearch = () => {
     },
     {
       id: 10,
-      name: 'Dr. Patrick White',
+      name: 'Dr. Sanjay Joshi',
       specialty: 'Endocrinologist',
       experience: '12 years',
       location: "Diabetes & Hormone Center, Mumbai",
@@ -198,7 +199,7 @@ const DoctorSearch = () => {
     },
     {
       id: 11,
-      name: 'Dr. Theresa Hall',
+      name: 'Dr. Sneha Mukherjee',
       specialty: 'Allergist',
       experience: '8 years',
       location: "Allergy & Asthma Clinic, Delhi",
@@ -211,7 +212,7 @@ const DoctorSearch = () => {
     },
     {
       id: 12,
-      name: 'Dr. Kevin Hill',
+      name: 'Dr. Karthik Venkatesh',
       specialty: 'Urologist',
       experience: '14 years',
       location: "Urology Associates, Chennai",
@@ -224,7 +225,7 @@ const DoctorSearch = () => {
     },
     {
       id: 13,
-      name: 'Dr. Barbara Wright',
+      name: 'Dr. Ritu Malhotra',
       specialty: 'Oncologist',
       experience: '11 years',
       location: "Cancer Treatment Center, Bangalore",
@@ -237,7 +238,7 @@ const DoctorSearch = () => {
     },
     {
       id: 14,
-      name: 'Dr. Samuel Green',
+      name: 'Dr. Satish Nair',
       specialty: 'Rheumatologist',
       experience: '9 years',
       location: "Arthritis & Joint Clinic, Pune",
@@ -250,7 +251,7 @@ const DoctorSearch = () => {
     },
     {
       id: 15,
-      name: 'Dr. Ruth Carter',
+      name: 'Dr. Maya Chatterjee',
       specialty: 'Hematologist',
       experience: '13 years',
       location: "Blood Disorder Center, Mumbai",
@@ -479,6 +480,11 @@ const DoctorSearch = () => {
                 src={doctor.image}
                 alt={doctor.name}
                 className="w-full h-40 md:h-full object-cover"
+                loading="lazy" 
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"; // fallback image
+                }}
               />
             </div>
             <div className="flex-1 p-4">
@@ -554,6 +560,11 @@ const DoctorSearch = () => {
                 src={doctor.image}
                 alt={doctor.name}
                 className="w-full h-40 md:h-full object-cover"
+                loading="lazy"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"; // fallback image
+                }}
               />
             </div>
             <div className="flex-1 p-4">

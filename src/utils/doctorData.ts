@@ -3,7 +3,7 @@
 export const additionalDoctors = [
   {
     id: 16,
-    name: 'Dr. William Smith',
+    name: 'Dr. Rajesh Sharma',
     specialty: 'Neurologist',
     experience: '14 years',
     location: 'AIIMS Brain Center, Bangalore',
@@ -16,7 +16,7 @@ export const additionalDoctors = [
   },
   {
     id: 17,
-    name: 'Dr. Elizabeth Cooper',
+    name: 'Dr. Priya Patel',
     specialty: 'Dermatologist',
     experience: '9 years',
     location: 'Skin Health Clinic, Chennai',
@@ -29,7 +29,7 @@ export const additionalDoctors = [
   },
   {
     id: 18,
-    name: 'Dr. Andrew Parker',
+    name: 'Dr. Anil Kapoor',
     specialty: 'Cardiologist',
     experience: '22 years',
     location: 'Heart & Vascular Institute, Hyderabad',
@@ -42,7 +42,7 @@ export const additionalDoctors = [
   },
   {
     id: 19,
-    name: 'Dr. Rachel Green',
+    name: 'Dr. Meena Gupta',
     specialty: 'Psychiatrist',
     experience: '11 years',
     location: 'Mental Wellness Center, Kolkata',
@@ -55,7 +55,7 @@ export const additionalDoctors = [
   },
   {
     id: 20,
-    name: 'Dr. Daniel Wilson',
+    name: 'Dr. Vikram Singh',
     specialty: 'Orthopedic',
     experience: '17 years',
     location: 'Sports Medicine & Orthopedics, Pune',
@@ -68,7 +68,7 @@ export const additionalDoctors = [
   },
   {
     id: 21,
-    name: 'Dr. Julia Martinez',
+    name: 'Dr. Anjali Desai',
     specialty: 'Endocrinologist',
     experience: '13 years',
     location: 'Diabetes & Hormone Center, Ahmedabad',
@@ -81,7 +81,7 @@ export const additionalDoctors = [
   },
   {
     id: 22,
-    name: 'Dr. Kevin Chang',
+    name: 'Dr. Suresh Kumar',
     specialty: 'Ophthalmologist',
     experience: '19 years',
     location: 'Vision Care Institute, Jaipur',
@@ -94,7 +94,7 @@ export const additionalDoctors = [
   },
   {
     id: 23,
-    name: 'Dr. Sophia Adams',
+    name: 'Dr. Nandini Reddy',
     specialty: 'Pediatrician',
     experience: '12 years',
     location: "Children's Health Center, Lucknow",
@@ -107,7 +107,7 @@ export const additionalDoctors = [
   },
   {
     id: 24,
-    name: 'Dr. Tyler Johnson',
+    name: 'Dr. Arjun Khanna',
     specialty: 'Allergist',
     experience: '8 years',
     location: 'Allergy & Asthma Specialists, Bhopal',
@@ -120,7 +120,7 @@ export const additionalDoctors = [
   },
   {
     id: 25,
-    name: 'Dr. Olivia Watson',
+    name: 'Dr. Sunita Verma',
     specialty: 'Rheumatologist',
     experience: '16 years',
     location: 'Arthritis Treatment Center, Chandigarh',

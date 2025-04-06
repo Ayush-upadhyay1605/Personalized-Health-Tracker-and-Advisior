@@ -103,3 +103,26 @@ html, body {
     margin-bottom: 1rem !important;
   }
 }
+
+/* Improve doctor images display */
+.doctor-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  min-height: 180px;
+}
+
+/* Fix image aspect ratio issues */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Better image loading on slow connections */
+img[loading="lazy"] {
+  transition: opacity 0.3s ease;
+}
+
+img[loading="lazy"]:not([src]) {
+  opacity: 0;
+}
