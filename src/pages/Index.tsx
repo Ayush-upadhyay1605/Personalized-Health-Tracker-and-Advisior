@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Calendar, Activity, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -30,6 +31,8 @@ const Index = () => {
   };
 
   const handleFindDoctorsClick = () => {
+    // Store a flag in localStorage to indicate that we want to show more doctors
+    localStorage.setItem('showMoreDoctors', 'true');
     navigate('/doctor-search');
   };
 

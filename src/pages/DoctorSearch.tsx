@@ -16,10 +16,29 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import BackToHomeButton from '@/components/navigation/BackToHomeButton';
+import { useDoctorSearch } from '@/components/DoctorSearchContext';
+import { additionalDoctors } from '@/utils/doctorData';
+
+// Define libraries using the proper Libraries type
+const libraries: Libraries = ['places'];
+
+// Map container style
+const mapContainerStyle = {
+  width: '100%',
+  height: '500px',
+  borderRadius: '0.5rem'
+};
+
+// Center on US by default
+const defaultCenter = {
+  lat: 37.7749,
+  lng: -122.4194
+};
 
 const DoctorSearch = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { showMoreDoctors } = useDoctorSearch();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('All');
   const [isVideoCallOpen, setIsVideoCallOpen] = useState(false);
@@ -27,14 +46,12 @@ const DoctorSearch = () => {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const [locationStatus, setLocationStatus] = useState('');
-  const [mapCenter, setMapCenter] = useState({
-    lat: 37.7749,
-    lng: -122.4194
-  });
+  const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [selectedMapDoctor, setSelectedMapDoctor] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
 
-  const doctors = [
+  // Base doctor data
+  const baseDoctors = [
     {
       id: 1,
       name: 'Dr. Sarah Johnson',
@@ -48,9 +65,196 @@ const DoctorSearch = () => {
       image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       coordinates: { lat: 40.7128, lng: -74.0060 }
     },
-    // ... rest of doctors data
+    {
+      id: 2,
+      name: 'Dr. Michael Brown',
+      specialty: 'Dermatologist',
+      experience: '12 years',
+      location: "SkinCare Clinic, Los Angeles",
+      rating: 4.6,
+      reviews: 95,
+      fee: '$130',
+      availableToday: false,
+      image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 34.0522, lng: -118.2437 }
+    },
+    {
+      id: 3,
+      name: 'Dr. Emily Davis',
+      specialty: 'Gynecologist',
+      experience: '10 years',
+      location: "Women's Health Center, Chicago",
+      rating: 4.7,
+      reviews: 110,
+      fee: '$140',
+      availableToday: true,
+      image: 'https://images.unsplash.com/photo-1588173454394-29842817ae78?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 41.8781, lng: -87.6298 }
+    },
+    {
+      id: 4,
+      name: 'Dr. David Wilson',
+      specialty: 'Pediatrician',
+      experience: '8 years',
+      location: "Children's Hospital, Houston",
+      rating: 4.9,
+      reviews: 142,
+      fee: '$120',
+      availableToday: true,
+      image: 'https://images.unsplash.com/photo-1628592737646-999419db23c5?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 29.7604, lng: -95.3698 }
+    },
+    {
+      id: 5,
+      name: 'Dr. Jennifer Garcia',
+      specialty: 'Orthopedic',
+      experience: '14 years',
+      location: "Orthopedic Clinic, Miami",
+      rating: 4.5,
+      reviews: 88,
+      fee: '$160',
+      availableToday: false,
+      image: 'https://images.unsplash.com/photo-1591604029549-92755189876a?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 25.7617, lng: -80.1918 }
+    },
+    {
+      id: 6,
+      name: 'Dr. Robert Martinez',
+      specialty: 'Neurologist',
+      experience: '11 years',
+      location: "NeuroCare Center, San Francisco",
+      rating: 4.7,
+      reviews: 105,
+      fee: '$150',
+      availableToday: true,
+      image: 'https://images.unsplash.com/photo-1505751172876-9aba583c2bf6?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 37.7749, lng: -122.4194 }
+    },
+    {
+      id: 7,
+      name: 'Dr. Linda Anderson',
+      specialty: 'Cardiologist',
+      experience: '9 years',
+      location: "Heart Health Clinic, Boston",
+      rating: 4.6,
+      reviews: 92,
+      fee: '$140',
+      availableToday: false,
+      image: 'https://images.unsplash.com/photo-1532938314630-e96f17bb43e3?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 42.3601, lng: -71.0589 }
+    },
+    {
+      id: 8,
+      name: 'Dr. Christopher Thomas',
+      specialty: 'Ophthalmologist',
+      experience: '13 years',
+      location: "EyeCare Institute, Philadelphia",
+      rating: 4.8,
+      reviews: 120,
+      fee: '$130',
+      availableToday: true,
+      image: 'https://images.unsplash.com/photo-1583324113626-70df0f4deaab?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 39.9526, lng: -75.1652 }
+    },
+    {
+      id: 9,
+      name: 'Dr. Angela Jackson',
+      specialty: 'Psychiatrist',
+      experience: '10 years',
+      location: "Mental Health Clinic, Seattle",
+      rating: 4.7,
+      reviews: 108,
+      fee: '$120',
+      availableToday: false,
+      image: 'https://images.unsplash.com/photo-1628890923662-2cb23c2e3cfe?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 47.6062, lng: -122.3321 }
+    },
+    {
+      id: 10,
+      name: 'Dr. Patrick White',
+      specialty: 'Endocrinologist',
+      experience: '12 years',
+      location: "Diabetes & Hormone Center, Denver",
+      rating: 4.9,
+      reviews: 135,
+      fee: '$140',
+      availableToday: true,
+      image: 'https://images.unsplash.com/photo-1537368910025-703dfdb6a5de?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 39.7392, lng: -104.9903 }
+    },
+    {
+      id: 11,
+      name: 'Dr. Theresa Hall',
+      specialty: 'Allergist',
+      experience: '8 years',
+      location: "Allergy & Asthma Clinic, Atlanta",
+      rating: 4.6,
+      reviews: 85,
+      fee: '$130',
+      availableToday: false,
+      image: 'https://images.unsplash.com/photo-1532938314630-e96f17bb43e3?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 33.7490, lng: -84.3880 }
+    },
+    {
+      id: 12,
+      name: 'Dr. Kevin Hill',
+      specialty: 'Urologist',
+      experience: '14 years',
+      location: "Urology Associates, Phoenix",
+      rating: 4.7,
+      reviews: 112,
+      fee: '$150',
+      availableToday: true,
+      image: 'https://images.unsplash.com/photo-1505751172876-9aba583c2bf6?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 33.4484, lng: -112.0740 }
+    },
+    {
+      id: 13,
+      name: 'Dr. Barbara Wright',
+      specialty: 'Oncologist',
+      experience: '11 years',
+      location: "Cancer Treatment Center, Baltimore",
+      rating: 4.8,
+      reviews: 128,
+      fee: '$160',
+      availableToday: false,
+      image: 'https://images.unsplash.com/photo-1591604029549-92755189876a?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 39.2904, lng: -76.6122 }
+    },
+    {
+      id: 14,
+      name: 'Dr. Samuel Green',
+      specialty: 'Rheumatologist',
+      experience: '9 years',
+      location: "Arthritis & Joint Clinic, Orlando",
+      rating: 4.5,
+      reviews: 90,
+      fee: '$140',
+      availableToday: true,
+      image: 'https://images.unsplash.com/photo-1583324113626-70df0f4deaab?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 28.5383, lng: -81.3792 }
+    },
+    {
+      id: 15,
+      name: 'Dr. Ruth Carter',
+      specialty: 'Hematologist',
+      experience: '13 years',
+      location: "Blood Disorder Center, San Antonio",
+      rating: 4.9,
+      reviews: 145,
+      fee: '$150',
+      availableToday: true,
+      image: 'https://images.unsplash.com/photo-1537368910025-703dfdb6a5de?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      coordinates: { lat: 29.4241, lng: -98.4936 }
+    }
   ];
 
+  // Combine doctors based on the showMoreDoctors flag
+  const doctors = showMoreDoctors 
+    ? [...baseDoctors, ...additionalDoctors]
+    : baseDoctors;
+
+  // Update specialties list to include all specialties from doctors data
   const specialties = [
     'All', 
     'Cardiologist', 
@@ -68,14 +272,6 @@ const DoctorSearch = () => {
     'Rheumatologist',
     'Hematologist'
   ];
-
-  const libraries: Libraries = ['places'];
-
-  const mapContainerStyle = {
-    width: '100%',
-    height: '500px',
-    borderRadius: '0.5rem'
-  };
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: "YOUR_API_KEY",
@@ -154,7 +350,7 @@ const DoctorSearch = () => {
       );
       return distanceA - distanceB;
     });
-  }, [userLocation, calculateDistance]);
+  }, [userLocation, calculateDistance, doctors]);
 
   const getFilteredDoctors = useCallback(() => {
     let filtered = getSortedDoctorsByDistance();
@@ -187,7 +383,7 @@ const DoctorSearch = () => {
       );
       return distance <= 50;
     });
-  }, [userLocation, getSortedDoctorsByDistance, calculateDistance]);
+  }, [userLocation, getSortedDoctorsByDistance, calculateDistance, doctors]);
 
   const getOnlineDoctors = useCallback(() => {
     return getFilteredDoctors().filter(doctor => doctor.id % 2 === 0);
@@ -526,12 +722,18 @@ const DoctorSearch = () => {
     );
   };
 
+  // Modified return statement to show the number of doctors available
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">Find Doctors</h1>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Find Doctors</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                {doctors.length} healthcare professionals available
+              </p>
+            </div>
             <BackToHomeButton />
           </div>
           <div className="mt-4 relative">
@@ -564,91 +766,3 @@ const DoctorSearch = () => {
                 onClick={() => setSelectedSpecialty(specialty)}
               >
                 {specialty}
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange}>
-          <TabsList className="mb-6">
-            <TabsTrigger value="all">All Doctors</TabsTrigger>
-            <TabsTrigger value="nearby">Nearby</TabsTrigger>
-            <TabsTrigger value="online">Online Consultation</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="all" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-lg font-medium text-gray-900">Available Doctors</h2>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                Sort by
-              </Button>
-            </div>
-            
-            <div className="space-y-4">
-              {getFilteredDoctors().length > 0 ? (
-                getFilteredDoctors().map(doctor => (
-                  <DoctorCard key={doctor.id} doctor={doctor} />
-                ))
-              ) : (
-                <div className="text-center py-12">
-                  <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No doctors found</h3>
-                  <p className="text-gray-500">Try adjusting your search criteria</p>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="nearby" className="space-y-6">
-            {renderMapSection()}
-          </TabsContent>
-          
-          <TabsContent value="online" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-lg font-medium text-gray-900">Online Consultation</h2>
-              <div className="flex items-center text-sm text-gray-500">
-                <Clock className="h-4 w-4 mr-1 text-green-500" />
-                <span>Available now</span>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              {getOnlineDoctors().length > 0 ? (
-                getOnlineDoctors().map(doctor => (
-                  <OnlineDoctorCard key={`online-${doctor.id}`} doctor={doctor} />
-                ))
-              ) : (
-                <div className="text-center py-12">
-                  <Video className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No online doctors available</h3>
-                  <p className="text-gray-500">Check back later or try a different specialty</p>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </main>
-      
-      {isVideoCallOpen && selectedDoctor && (
-        <DoctorVideoCall 
-          doctorName={selectedDoctor.name}
-          doctorImage={selectedDoctor.image}
-          open={isVideoCallOpen}
-          onOpenChange={setIsVideoCallOpen}
-        />
-      )}
-      
-      {isChatOpen && selectedDoctor && (
-        <DoctorChat 
-          doctorName={selectedDoctor.name}
-          doctorImage={selectedDoctor.image}
-          open={isChatOpen}
-          onOpenChange={setIsChatOpen}
-        />
-      )}
-    </div>
-  );
-};
-
-export default DoctorSearch;

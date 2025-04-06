@@ -17,6 +17,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import DashboardLayout from "./components/DashboardLayout";
 import Welcome from "./pages/Welcome";
+import { DoctorSearchProvider } from "./components/DoctorSearchContext";
 
 // Create a new QueryClient instance outside of component render
 const queryClient = new QueryClient({
@@ -35,48 +36,50 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Welcome />} />
-            <Route path="/home" element={<Index />} />
-            
-            {/* Doctor Search and Booking Routes */}
-            <Route path="/doctor-search" element={<DoctorSearch />} />
-            <Route path="/book-appointment" element={<BookAppointment />} />
-            
-            {/* Dashboard Routes */}
-            <Route path="/dashboard" element={
-              <DashboardLayout>
-                <Dashboard />
-              </DashboardLayout>
-            } />
-            <Route path="/metrics" element={
-              <DashboardLayout>
-                <HealthMetrics />
-              </DashboardLayout>
-            } />
-            <Route path="/medications" element={
-              <DashboardLayout>
-                <Medications />
-              </DashboardLayout>
-            } />
-            <Route path="/appointments" element={
-              <DashboardLayout>
-                <Appointments />
-              </DashboardLayout>
-            } />
-            <Route path="/profile" element={
-              <DashboardLayout>
-                <Profile />
-              </DashboardLayout>
-            } />
-            <Route path="/settings" element={
-              <DashboardLayout>
-                <Settings />
-              </DashboardLayout>
-            } />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <DoctorSearchProvider>
+            <Routes>
+              <Route path="/" element={<Welcome />} />
+              <Route path="/home" element={<Index />} />
+              
+              {/* Doctor Search and Booking Routes */}
+              <Route path="/doctor-search" element={<DoctorSearch />} />
+              <Route path="/book-appointment" element={<BookAppointment />} />
+              
+              {/* Dashboard Routes */}
+              <Route path="/dashboard" element={
+                <DashboardLayout>
+                  <Dashboard />
+                </DashboardLayout>
+              } />
+              <Route path="/metrics" element={
+                <DashboardLayout>
+                  <HealthMetrics />
+                </DashboardLayout>
+              } />
+              <Route path="/medications" element={
+                <DashboardLayout>
+                  <Medications />
+                </DashboardLayout>
+              } />
+              <Route path="/appointments" element={
+                <DashboardLayout>
+                  <Appointments />
+                </DashboardLayout>
+              } />
+              <Route path="/profile" element={
+                <DashboardLayout>
+                  <Profile />
+                </DashboardLayout>
+              } />
+              <Route path="/settings" element={
+                <DashboardLayout>
+                  <Settings />
+                </DashboardLayout>
+              } />
+              
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </DoctorSearchProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
