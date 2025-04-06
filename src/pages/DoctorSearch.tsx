@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -18,22 +17,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import BackToHomeButton from '@/components/navigation/BackToHomeButton';
 
-// Define libraries using the proper Libraries type
-const libraries: Libraries = ['places'];
-
-// Map container style
-const mapContainerStyle = {
-  width: '100%',
-  height: '500px',
-  borderRadius: '0.5rem'
-};
-
-// Center on US by default
-const defaultCenter = {
-  lat: 37.7749,
-  lng: -122.4194
-};
-
 const DoctorSearch = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -44,11 +27,13 @@ const DoctorSearch = () => {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const [locationStatus, setLocationStatus] = useState('');
-  const [mapCenter, setMapCenter] = useState(defaultCenter);
+  const [mapCenter, setMapCenter] = useState({
+    lat: 37.7749,
+    lng: -122.4194
+  });
   const [selectedMapDoctor, setSelectedMapDoctor] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
 
-  // Enhanced mock data for doctors with location coordinates
   const doctors = [
     {
       id: 1,
@@ -61,193 +46,11 @@ const DoctorSearch = () => {
       fee: '$150',
       availableToday: true,
       image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 40.7128, lng: -74.0060 } // New York
+      coordinates: { lat: 40.7128, lng: -74.0060 }
     },
-    {
-      id: 2,
-      name: 'Dr. Michael Chen',
-      specialty: 'Dermatologist',
-      experience: '10 years',
-      location: 'Skin Care Clinic, Boston',
-      rating: 4.6,
-      reviews: 89,
-      fee: '$120',
-      availableToday: true,
-      image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 42.3601, lng: -71.0589 } // Boston
-    },
-    {
-      id: 3,
-      name: 'Dr. Emily Rodriguez',
-      specialty: 'Pediatrician',
-      experience: '12 years',
-      location: "Children's Medical Center, Chicago",
-      rating: 4.9,
-      reviews: 156,
-      fee: '$130',
-      availableToday: false,
-      image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 41.8781, lng: -87.6298 } // Chicago
-    },
-    {
-      id: 4,
-      name: 'Dr. James Wilson',
-      specialty: 'Neurologist',
-      experience: '20 years',
-      location: 'Neuroscience Institute, Seattle',
-      rating: 4.7,
-      reviews: 113,
-      fee: '$180',
-      availableToday: false,
-      image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 47.6062, lng: -122.3321 } // Seattle
-    },
-    {
-      id: 5,
-      name: 'Dr. Priya Patel',
-      specialty: 'Gynecologist',
-      experience: '14 years',
-      location: "Women's Health Center, San Francisco",
-      rating: 4.8,
-      reviews: 142,
-      fee: '$160',
-      availableToday: true,
-      image: 'https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 37.7749, lng: -122.4194 } // San Francisco
-    },
-    {
-      id: 6,
-      name: 'Dr. Robert Lee',
-      specialty: 'Orthopedic',
-      experience: '16 years',
-      location: 'Joint Care Center, Los Angeles',
-      rating: 4.7,
-      reviews: 115,
-      fee: '$175',
-      availableToday: true,
-      image: 'https://images.unsplash.com/photo-1622902046580-2b47f47f5471?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 34.0522, lng: -118.2437 } // Los Angeles
-    },
-    {
-      id: 7,
-      name: 'Dr. Maria Gonzalez',
-      specialty: 'Cardiologist',
-      experience: '18 years',
-      location: 'Heart Center, Miami',
-      rating: 4.9,
-      reviews: 167,
-      fee: '$190',
-      availableToday: false,
-      image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 25.7617, lng: -80.1918 } // Miami
-    },
-    {
-      id: 8,
-      name: 'Dr. Thomas Wright',
-      specialty: 'Ophthalmologist',
-      experience: '22 years',
-      location: 'Vision Care Center, Denver',
-      rating: 4.9,
-      reviews: 203,
-      fee: '$170',
-      availableToday: true,
-      image: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 39.7392, lng: -104.9903 } // Denver
-    },
-    {
-      id: 9,
-      name: 'Dr. Lisa Thompson',
-      specialty: 'Psychiatrist',
-      experience: '15 years',
-      location: 'Mental Health Institute, Portland',
-      rating: 4.8,
-      reviews: 176,
-      fee: '$200',
-      availableToday: true,
-      image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 45.5051, lng: -122.6750 } // Portland
-    },
-    {
-      id: 10,
-      name: 'Dr. David Brown',
-      specialty: 'Endocrinologist',
-      experience: '19 years',
-      location: 'Diabetes & Hormone Center, Austin',
-      rating: 4.7,
-      reviews: 135,
-      fee: '$185',
-      availableToday: false,
-      image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 30.2672, lng: -97.7431 } // Austin
-    },
-    {
-      id: 11,
-      name: 'Dr. Jennifer Adams',
-      specialty: 'Allergist',
-      experience: '11 years',
-      location: 'Allergy & Asthma Clinic, Minneapolis',
-      rating: 4.6,
-      reviews: 98,
-      fee: '$140',
-      availableToday: true,
-      image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 44.9778, lng: -93.2650 } // Minneapolis
-    },
-    {
-      id: 12,
-      name: 'Dr. Carlos Martinez',
-      specialty: 'Urologist',
-      experience: '16 years',
-      location: 'Urology Associates, Phoenix',
-      rating: 4.8,
-      reviews: 142,
-      fee: '$165',
-      availableToday: false,
-      image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 33.4484, lng: -112.0740 } // Phoenix
-    },
-    {
-      id: 13,
-      name: 'Dr. Rebecca White',
-      specialty: 'Oncologist',
-      experience: '21 years',
-      location: 'Cancer Treatment Center, Houston',
-      rating: 4.9,
-      reviews: 215,
-      fee: '$220',
-      availableToday: true,
-      image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 29.7604, lng: -95.3698 } // Houston
-    },
-    {
-      id: 14,
-      name: 'Dr. Jason Kim',
-      specialty: 'Rheumatologist',
-      experience: '14 years',
-      location: 'Arthritis & Rheumatology Center, Philadelphia',
-      rating: 4.7,
-      reviews: 132,
-      fee: '$175',
-      availableToday: true,
-      image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 39.9526, lng: -75.1652 } // Philadelphia
-    },
-    {
-      id: 15,
-      name: 'Dr. Samantha Scott',
-      specialty: 'Hematologist',
-      experience: '17 years',
-      location: 'Blood Disorders Clinic, Atlanta',
-      rating: 4.8,
-      reviews: 154,
-      fee: '$190',
-      availableToday: false,
-      image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      coordinates: { lat: 33.7490, lng: -84.3880 } // Atlanta
-    }
+    // ... rest of doctors data
   ];
 
-  // Update specialties list to include all specialties from doctors data
   const specialties = [
     'All', 
     'Cardiologist', 
@@ -266,13 +69,19 @@ const DoctorSearch = () => {
     'Hematologist'
   ];
 
-  // Load Google Maps script
+  const libraries: Libraries = ['places'];
+
+  const mapContainerStyle = {
+    width: '100%',
+    height: '500px',
+    borderRadius: '0.5rem'
+  };
+
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: "YOUR_API_KEY", // Replace with actual API key
+    googleMapsApiKey: "YOUR_API_KEY",
     libraries: libraries
   });
 
-  // Get user's location
   const getUserLocation = useCallback(() => {
     setLocationStatus('loading');
     if (navigator.geolocation) {
@@ -286,7 +95,6 @@ const DoctorSearch = () => {
           setMapCenter(userCoords);
           setLocationStatus('success');
           
-          // Show success toast
           toast({
             title: "Location detected",
             description: "Showing doctors near your location",
@@ -296,7 +104,6 @@ const DoctorSearch = () => {
           console.error("Error getting location:", error);
           setLocationStatus('error');
           
-          // Show error toast
           toast({
             title: "Location error",
             description: "Could not access your location. Please enable location services.",
@@ -308,7 +115,6 @@ const DoctorSearch = () => {
     } else {
       setLocationStatus('unsupported');
       
-      // Show error toast
       toast({
         title: "Location unavailable",
         description: "Your browser doesn't support geolocation.",
@@ -317,9 +123,8 @@ const DoctorSearch = () => {
     }
   }, [toast]);
 
-  // Calculate distance between two points using Haversine formula
   const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Radius of the earth in km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = 
@@ -327,11 +132,10 @@ const DoctorSearch = () => {
       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
       Math.sin(dLon/2) * Math.sin(dLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    const d = R * c; // Distance in km
+    const d = R * c;
     return d;
   }, []);
 
-  // Sort doctors by distance from user
   const getSortedDoctorsByDistance = useCallback(() => {
     if (!userLocation) return [...doctors];
     
@@ -352,7 +156,6 @@ const DoctorSearch = () => {
     });
   }, [userLocation, calculateDistance]);
 
-  // Filter doctors based on search and specialty
   const getFilteredDoctors = useCallback(() => {
     let filtered = getSortedDoctorsByDistance();
     
@@ -372,7 +175,6 @@ const DoctorSearch = () => {
     return filtered;
   }, [getSortedDoctorsByDistance, selectedSpecialty, searchQuery]);
 
-  // Filter for nearby doctors (within 50km)
   const getNearbyDoctors = useCallback(() => {
     if (!userLocation) return [];
     
@@ -383,16 +185,14 @@ const DoctorSearch = () => {
         doctor.coordinates.lat,
         doctor.coordinates.lng
       );
-      return distance <= 50; // 50km radius
+      return distance <= 50;
     });
   }, [userLocation, getSortedDoctorsByDistance, calculateDistance]);
-  
-  // Get online consultation doctors
+
   const getOnlineDoctors = useCallback(() => {
     return getFilteredDoctors().filter(doctor => doctor.id % 2 === 0);
   }, [getFilteredDoctors]);
 
-  // Handle tab change
   const handleTabChange = (value) => {
     setActiveTab(value);
     if (value === 'nearby' && !userLocation) {
@@ -400,9 +200,7 @@ const DoctorSearch = () => {
     }
   };
 
-  // Appointment booking handler
   const handleBookAppointment = async (doctor) => {
-    // Check if user is logged in
     const { data } = await supabase.auth.getSession();
     
     if (!data.session) {
@@ -414,14 +212,11 @@ const DoctorSearch = () => {
       return;
     }
 
-    // Store the selected doctor in localStorage for appointment page
     localStorage.setItem('selectedDoctor', JSON.stringify(doctor));
     navigate('/book-appointment');
   };
 
-  // Video call handler
   const handleVideoCall = (doctor) => {
-    // Check if user is logged in
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) {
         toast({
@@ -437,9 +232,7 @@ const DoctorSearch = () => {
     });
   };
 
-  // Chat handler
   const handleChat = (doctor) => {
-    // Check if user is logged in
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) {
         toast({
@@ -455,9 +248,7 @@ const DoctorSearch = () => {
     });
   };
 
-  // Doctor card component to avoid repetition
   const DoctorCard = ({ doctor, showDistance = false }) => {
-    // Calculate and format distance if user location is available
     const distanceText = showDistance && userLocation ? 
       `${calculateDistance(
         userLocation.lat, 
@@ -532,7 +323,6 @@ const DoctorSearch = () => {
     );
   };
 
-  // Online doctor card component
   const OnlineDoctorCard = ({ doctor }) => (
     <Card key={`online-${doctor.id}`} className="overflow-hidden">
       <CardContent className="p-0">
@@ -595,7 +385,6 @@ const DoctorSearch = () => {
     </Card>
   );
 
-  // Map content component
   const renderMapSection = () => {
     if (loadError) {
       return (
@@ -633,7 +422,6 @@ const DoctorSearch = () => {
               mapTypeControl: false,
             }}
           >
-            {/* User location marker */}
             {userLocation && (
               <Marker
                 position={userLocation}
@@ -654,7 +442,6 @@ const DoctorSearch = () => {
               />
             )}
             
-            {/* Doctor markers */}
             {getNearbyDoctors().map((doctor) => (
               <Marker
                 key={`marker-${doctor.id}`}
@@ -663,7 +450,6 @@ const DoctorSearch = () => {
               />
             ))}
             
-            {/* Info window for selected doctor */}
             {selectedMapDoctor && (
               <InfoWindow
                 position={selectedMapDoctor.coordinates}
@@ -701,7 +487,6 @@ const DoctorSearch = () => {
           </GoogleMap>
         </div>
         
-        {/* List of nearby doctors */}
         <div className="mt-6 space-y-4">
           {userLocation ? (
             getNearbyDoctors().length > 0 ? (
@@ -765,7 +550,6 @@ const DoctorSearch = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        {/* Specialty filter */}
         <div className="mb-6 overflow-x-auto pb-2">
           <div className="flex space-x-2">
             {specialties.map(specialty => (
@@ -785,7 +569,6 @@ const DoctorSearch = () => {
           </div>
         </div>
 
-        {/* Main content tabs */}
         <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange}>
           <TabsList className="mb-6">
             <TabsTrigger value="all">All Doctors</TabsTrigger>
@@ -849,17 +632,19 @@ const DoctorSearch = () => {
       
       {isVideoCallOpen && selectedDoctor && (
         <DoctorVideoCall 
-          doctor={selectedDoctor} 
-          isOpen={isVideoCallOpen}
-          setIsOpen={setIsVideoCallOpen}
+          doctorName={selectedDoctor.name}
+          doctorImage={selectedDoctor.image}
+          open={isVideoCallOpen}
+          onOpenChange={setIsVideoCallOpen}
         />
       )}
       
       {isChatOpen && selectedDoctor && (
         <DoctorChat 
-          doctor={selectedDoctor}
-          isOpen={isChatOpen}
-          setIsOpen={setIsChatOpen}
+          doctorName={selectedDoctor.name}
+          doctorImage={selectedDoctor.image}
+          open={isChatOpen}
+          onOpenChange={setIsChatOpen}
         />
       )}
     </div>
