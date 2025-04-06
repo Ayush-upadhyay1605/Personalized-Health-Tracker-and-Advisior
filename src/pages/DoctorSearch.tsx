@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -766,3 +767,82 @@ const DoctorSearch = () => {
                 onClick={() => setSelectedSpecialty(specialty)}
               >
                 {specialty}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+          <TabsList className="mb-6">
+            <TabsTrigger value="all" className="flex items-center gap-1">
+              <ListFilter className="h-4 w-4" />
+              All Doctors
+            </TabsTrigger>
+            <TabsTrigger value="nearby" className="flex items-center gap-1">
+              <MapPin className="h-4 w-4" />
+              Nearby
+            </TabsTrigger>
+            <TabsTrigger value="online" className="flex items-center gap-1">
+              <Video className="h-4 w-4" />
+              Online Consultation
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="all" className="space-y-4">
+            <div className="grid grid-cols-1 gap-4">
+              {getFilteredDoctors().length > 0 ? (
+                getFilteredDoctors().map(doctor => (
+                  <DoctorCard key={doctor.id} doctor={doctor} />
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No doctors found matching your search criteria.</p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="nearby" className="space-y-4">
+            {renderMapSection()}
+          </TabsContent>
+
+          <TabsContent value="online" className="space-y-4">
+            <div className="grid grid-cols-1 gap-4">
+              {getOnlineDoctors().length > 0 ? (
+                getOnlineDoctors().map(doctor => (
+                  <OnlineDoctorCard key={doctor.id} doctor={doctor} />
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No doctors available for online consultation at the moment.</p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Video call modal */}
+        {isVideoCallOpen && selectedDoctor && (
+          <DoctorVideoCall
+            doctorName={selectedDoctor.name}
+            doctorImage={selectedDoctor.image}
+            open={isVideoCallOpen}
+            onOpenChange={setIsVideoCallOpen}
+          />
+        )}
+
+        {/* Chat modal */}
+        {isChatOpen && selectedDoctor && (
+          <DoctorChat
+            doctorName={selectedDoctor.name}
+            doctorImage={selectedDoctor.image}
+            open={isChatOpen}
+            onOpenChange={setIsChatOpen}
+          />
+        )}
+      </main>
+    </div>
+  );
+};
+
+export default DoctorSearch;
