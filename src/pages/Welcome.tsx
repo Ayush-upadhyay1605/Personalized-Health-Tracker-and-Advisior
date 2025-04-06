@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -5,14 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import SignInDialog from '@/components/auth/SignInDialog';
 import SignUpDialog from '@/components/auth/SignUpDialog';
-import SampleAccountsSetup from '@/components/SampleAccountsSetup';
-import SampleAppointmentsSetup from '@/components/SampleAppointmentsSetup';
 
 const Welcome = () => {
   const [userType, setUserType] = useState<'patient' | 'doctor' | null>(null);
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [isSignUpOpen, setIsSignUpOpen] = useState(false);
-  const [showDevTools, setShowDevTools] = useState(false);
   const navigate = useNavigate();
 
   const handleRoleSelect = (role: 'patient' | 'doctor') => {
@@ -23,22 +21,10 @@ const Welcome = () => {
     navigate('/');
   };
 
-  const toggleDevTools = () => {
-    setShowDevTools(!showDevTools);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-health-light to-white flex flex-col">
-      <header className="w-full py-6 px-8 flex justify-between items-center">
+      <header className="w-full py-6 px-8">
         <div className="text-health-primary font-bold text-3xl">HealthHub</div>
-        <div>
-          <button 
-            onClick={toggleDevTools}
-            className="text-xs text-gray-400 hover:text-gray-600"
-          >
-            {showDevTools ? "Hide Dev Tools" : "Dev Tools"}
-          </button>
-        </div>
       </header>
       
       <main className="flex-1 flex items-center justify-center px-4">
@@ -159,32 +145,6 @@ const Welcome = () => {
           </motion.div>
         </div>
       </main>
-      
-      {showDevTools && (
-        <motion.div 
-          className="mt-8 border-t pt-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <SampleAccountsSetup />
-          <SampleAppointmentsSetup />
-
-          <div className="mt-4 p-4 bg-blue-50 rounded-md">
-            <h3 className="font-medium mb-2">Test Credentials</h3>
-            <div className="text-sm space-y-1">
-              <p><strong>Patient:</strong> patient@example.com / Password123</p>
-              <p><strong>Doctor:</strong> doctor@example.com / Password123</p>
-            </div>
-            <div className="mt-2 text-xs text-gray-600">
-              <p>1. Log in with the patient credentials</p>
-              <p>2. Go to Doctor Search and book an appointment with Dr. Sample</p>
-              <p>3. Log out and log in with the doctor credentials</p>
-              <p>4. Check the Doctor Dashboard to see the appointment</p>
-            </div>
-          </div>
-        </motion.div>
-      )}
       
       <SignInDialog 
         isOpen={isSignInOpen} 

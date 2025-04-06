@@ -12,7 +12,6 @@ const Navbar = () => {
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [isSignUpOpen, setIsSignUpOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -22,22 +21,12 @@ const Navbar = () => {
       (event, session) => {
         setUser(session?.user ?? null);
         
-        if (session?.user) {
-          // Get user role from metadata
-          const role = session.user.user_metadata.role || 'patient';
-          setUserRole(role);
-          console.log('User role:', role);
-        } else {
-          setUserRole(null);
-        }
-        
         if (event === 'SIGNED_IN') {
           console.log('User signed in:', session?.user?.email);
         }
         
         if (event === 'SIGNED_OUT') {
           console.log('User signed out');
-          setUserRole(null);
         }
       }
     );
@@ -45,11 +34,6 @@ const Navbar = () => {
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        const role = session.user.user_metadata.role || 'patient';
-        setUserRole(role);
-        console.log('User role from session:', role);
-      }
     });
     
     return () => subscription.unsubscribe();
@@ -79,12 +63,7 @@ const Navbar = () => {
 
   const handleViewDashboard = () => {
     if (user) {
-      // Redirect based on user role
-      if (userRole === 'doctor') {
-        navigate('/doctor-dashboard');
-      } else {
-        navigate('/dashboard');
-      }
+      navigate('/dashboard');
     } else {
       setIsSignInOpen(true);
       toast({
@@ -106,14 +85,13 @@ const Navbar = () => {
             <>
               <span className="text-gray-700">
                 Hello, {user.user_metadata.full_name || user.email}
-                {userRole === 'doctor' && " (Doctor)"}
               </span>
               <Button 
                 onClick={handleViewDashboard}
                 variant="default"
                 className="bg-health-primary text-white hover:bg-health-primary/90"
               >
-                View {userRole === 'doctor' ? 'Doctor Dashboard' : 'Dashboard'}
+                View Dashboard
               </Button>
               <Button 
                 onClick={handleSignOut}

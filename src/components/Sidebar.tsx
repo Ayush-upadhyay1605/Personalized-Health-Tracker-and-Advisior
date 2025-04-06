@@ -1,28 +1,12 @@
 
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Heart, Activity, Pill, User, Settings, Calendar, MessageCircle, Video } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useEffect } from 'react';
+import { Heart, Activity, Pill, User, Settings, Calendar } from 'lucide-react';
 
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [expanded] = useState(true);
-  const [userRole, setUserRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Check user role when component mounts
-    const checkUserRole = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        const role = data.session.user.user_metadata.role || 'patient';
-        setUserRole(role);
-      }
-    };
-    
-    checkUserRole();
-  }, []);
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -34,8 +18,7 @@ const Sidebar = () => {
     console.log('Sidebar logo: Navigating to /home');
   };
 
-  // Create different menu items based on user role
-  const patientMenuItems = [
+  const menuItems = [
     { icon: Activity, label: 'Dashboard', path: '/dashboard' },
     { icon: Heart, label: 'Health Metrics', path: '/metrics' },
     { icon: Pill, label: 'Medications', path: '/medications' },
@@ -43,17 +26,6 @@ const Sidebar = () => {
     { icon: User, label: 'Profile', path: '/profile' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];
-
-  const doctorMenuItems = [
-    { icon: Activity, label: 'Doctor Dashboard', path: '/doctor-dashboard' },
-    { icon: Calendar, label: 'Appointments', path: '/doctor-dashboard' },
-    { icon: MessageCircle, label: 'Patient Messages', path: '/doctor-dashboard' },
-    { icon: Video, label: 'Video Consultations', path: '/doctor-dashboard' },
-    { icon: User, label: 'Profile', path: '/profile' },
-    { icon: Settings, label: 'Settings', path: '/settings' },
-  ];
-
-  const menuItems = userRole === 'doctor' ? doctorMenuItems : patientMenuItems;
 
   return (
     <div className="w-64 h-screen bg-white border-r border-gray-200 flex flex-col">
@@ -67,7 +39,7 @@ const Sidebar = () => {
       <nav className="flex-1 px-4">
         <ul className="space-y-2">
           {menuItems.map((item) => (
-            <li key={item.path + item.label}>
+            <li key={item.path}>
               <Link
                 to={item.path}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${

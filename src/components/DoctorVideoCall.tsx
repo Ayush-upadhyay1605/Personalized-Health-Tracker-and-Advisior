@@ -1,179 +1,210 @@
 
-import { useState, useEffect } from 'react';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from '@/components/ui/drawer';
+import { useState, useEffect, useRef } from 'react';
+import { X, Mic, MicOff, Video, VideoOff, Phone } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { X, Video, Mic, MicOff, VideoOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface DoctorVideoCallProps {
-  doctorName?: string;
-  doctorImage?: string;
-  patientId?: string;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  doctorName: string;
+  doctorImage: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-const DoctorVideoCall = ({ 
-  doctorName = "Dr. Smith", 
-  doctorImage = "/placeholder.svg", 
-  patientId,
-  open = false, 
-  onOpenChange 
-}: DoctorVideoCallProps) => {
+const DoctorVideoCall = ({ doctorName, doctorImage, open, onOpenChange }: DoctorVideoCallProps) => {
   const { toast } = useToast();
-  const [isAudioOn, setIsAudioOn] = useState(true);
-  const [isVideoOn, setIsVideoOn] = useState(true);
-  const [callStatus, setCallStatus] = useState<'connecting' | 'connected' | 'ended'>('connecting');
+  const [isConnecting, setIsConnecting] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
   
-  // Log patient ID for debugging
-  useEffect(() => {
-    if (patientId) {
-      console.log(`Video call initialized with patient ID: ${patientId}`);
-    }
-  }, [patientId]);
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
 
-  // Simulate a connection delay
   useEffect(() => {
     if (open) {
-      const timer = setTimeout(() => {
-        setCallStatus('connected');
+      initializeCall();
+    } else {
+      endCall();
+    }
+
+    return () => {
+      endCall();
+    };
+  }, [open]);
+
+  const initializeCall = async () => {
+    try {
+      // Get local media stream
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      localStreamRef.current = stream;
+      
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+      }
+
+      // Create peer connection
+      const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+      peerConnectionRef.current = new RTCPeerConnection(configuration);
+
+      // Add tracks to peer connection
+      stream.getTracks().forEach(track => {
+        if (peerConnectionRef.current && localStreamRef.current) {
+          peerConnectionRef.current.addTrack(track, localStreamRef.current);
+        }
+      });
+
+      // Handle incoming tracks
+      peerConnectionRef.current.ontrack = (event) => {
+        if (remoteVideoRef.current && event.streams[0]) {
+          remoteVideoRef.current.srcObject = event.streams[0];
+        }
+      };
+
+      // In a real app, you would set up signaling here
+      // For demo purposes, we'll simulate a connection after a delay
+      setTimeout(() => {
+        setIsConnecting(false);
         toast({
-          title: "Call connected",
-          description: `You are now connected with the patient`,
+          title: "Connected",
+          description: `You are now in a call with ${doctorName}`,
         });
       }, 2000);
-      
-      return () => clearTimeout(timer);
+
+    } catch (error) {
+      console.error('Error accessing media devices:', error);
+      toast({
+        title: "Connection failed",
+        description: "Could not access camera or microphone",
+        variant: "destructive",
+      });
+      onOpenChange(false);
     }
-  }, [open, toast]);
-
-  const toggleAudio = () => {
-    setIsAudioOn(!isAudioOn);
-  };
-
-  const toggleVideo = () => {
-    setIsVideoOn(!isVideoOn);
   };
 
   const endCall = () => {
-    setCallStatus('ended');
-    if (onOpenChange) {
-      onOpenChange(false);
+    // Stop all tracks
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => track.stop());
+      localStreamRef.current = null;
     }
+
+    // Close peer connection
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
+    }
+
+    // Reset video elements
+    if (localVideoRef.current) {
+      localVideoRef.current.srcObject = null;
+    }
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = null;
+    }
+  };
+
+  const toggleMute = () => {
+    if (localStreamRef.current) {
+      const audioTracks = localStreamRef.current.getAudioTracks();
+      audioTracks.forEach(track => {
+        track.enabled = !track.enabled;
+      });
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const toggleVideo = () => {
+    if (localStreamRef.current) {
+      const videoTracks = localStreamRef.current.getVideoTracks();
+      videoTracks.forEach(track => {
+        track.enabled = !track.enabled;
+      });
+      setIsVideoOff(!isVideoOff);
+    }
+  };
+
+  const handleEndCall = () => {
     toast({
       title: "Call ended",
-      description: "The video call has been ended",
+      description: `Call with ${doctorName} has ended`,
     });
+    onOpenChange(false);
   };
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="h-[85vh] max-h-[85vh] flex flex-col">
-        <DrawerHeader className="border-b pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[90vw] md:max-w-[800px] h-[80vh] flex flex-col">
+        <DialogHeader>
+          <DialogTitle>Call with {doctorName}</DialogTitle>
+        </DialogHeader>
+        
+        <div className="flex-1 relative bg-black rounded-md overflow-hidden">
+          {/* Remote video (doctor) - takes full space */}
+          <video 
+            ref={remoteVideoRef} 
+            autoPlay 
+            playsInline
+            className="w-full h-full object-cover"
+          />
+          
+          {isConnecting && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
               <img 
                 src={doctorImage} 
-                alt={doctorName}
-                className="w-10 h-10 rounded-full object-cover mr-3"
+                alt={doctorName} 
+                className="w-24 h-24 rounded-full object-cover border-2 border-white mb-4" 
               />
-              <DrawerTitle>{doctorName}</DrawerTitle>
-              <span className="ml-3 text-sm text-gray-500">
-                {callStatus === 'connecting' ? 'Connecting...' : 
-                 callStatus === 'connected' ? 'Connected' : 'Call ended'}
-              </span>
-            </div>
-            <DrawerClose asChild>
-              <Button variant="ghost" size="icon" onClick={endCall}>
-                <X className="h-4 w-4" />
-              </Button>
-            </DrawerClose>
-          </div>
-        </DrawerHeader>
-        
-        {/* Video container */}
-        <div className="flex-1 bg-gray-900 flex items-center justify-center relative">
-          {callStatus === 'connecting' ? (
-            <div className="text-white text-center">
-              <div className="animate-pulse flex flex-col items-center">
-                <Video className="h-12 w-12 mb-4" />
-                <p>Connecting to patient...</p>
+              <p className="text-lg">Connecting to {doctorName}...</p>
+              <div className="mt-3 h-2 w-40 bg-gray-700 rounded-full overflow-hidden">
+                <div className="h-full bg-health-primary animate-pulse"></div>
               </div>
-            </div>
-          ) : callStatus === 'connected' ? (
-            <>
-              {/* Simulated video feed (replace with actual implementation) */}
-              <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                {isVideoOn ? (
-                  <div className="text-center text-white">
-                    <p className="mb-2">Patient Video Feed</p>
-                    <p className="text-xs text-gray-400">(Simulated for demo)</p>
-                  </div>
-                ) : (
-                  <div className="text-center text-white">
-                    <VideoOff className="h-16 w-16 mx-auto mb-2" />
-                    <p>Video is off</p>
-                  </div>
-                )}
-              </div>
-              
-              {/* Doctor video (small overlay) */}
-              <div className="absolute bottom-4 right-4 w-48 h-36 bg-gray-700 rounded-lg overflow-hidden border-2 border-gray-600">
-                <div className="w-full h-full flex items-center justify-center text-white text-sm">
-                  {isVideoOn ? (
-                    <>
-                      <img 
-                        src={doctorImage} 
-                        alt="Your video"
-                        className="w-full h-full object-cover"
-                      />
-                      <span className="absolute bottom-1 left-2 text-xs bg-black bg-opacity-50 px-2 py-1 rounded">You</span>
-                    </>
-                  ) : (
-                    <div className="text-center">
-                      <VideoOff className="h-8 w-8 mx-auto mb-1" />
-                      <p className="text-xs">Your video is off</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="text-white text-center">
-              <p>Call ended</p>
             </div>
           )}
+          
+          {/* Local video (patient) - small overlay */}
+          <div className="absolute bottom-4 right-4 w-32 h-24 rounded-md overflow-hidden border-2 border-white shadow-lg">
+            <video 
+              ref={localVideoRef} 
+              autoPlay 
+              playsInline 
+              muted 
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
         
-        {/* Controls */}
-        <div className="p-4 flex justify-center space-x-4">
+        {/* Call controls */}
+        <div className="flex justify-center space-x-4 mt-4">
           <Button 
-            variant={isAudioOn ? "default" : "destructive"} 
+            variant="outline" 
             size="icon" 
-            className="rounded-full h-12 w-12"
-            onClick={toggleAudio}
+            className={isMuted ? "bg-red-100 text-red-500" : ""} 
+            onClick={toggleMute}
           >
-            {isAudioOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
-          </Button>
-          <Button 
-            variant={isVideoOn ? "default" : "destructive"} 
-            size="icon" 
-            className="rounded-full h-12 w-12"
-            onClick={toggleVideo}
-          >
-            {isVideoOn ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
+            {isMuted ? <MicOff /> : <Mic />}
           </Button>
           <Button 
             variant="destructive" 
             size="icon" 
             className="rounded-full h-12 w-12"
-            onClick={endCall}
+            onClick={handleEndCall}
           >
-            <X className="h-5 w-5" />
+            <Phone className="transform rotate-135" />
+          </Button>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className={isVideoOff ? "bg-red-100 text-red-500" : ""} 
+            onClick={toggleVideo}
+          >
+            {isVideoOff ? <VideoOff /> : <Video />}
           </Button>
         </div>
-      </DrawerContent>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   );
 };
 
