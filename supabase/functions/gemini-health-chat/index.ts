@@ -18,7 +18,8 @@ serve(async (req) => {
   try {
     const { prompt } = await req.json();
 
-    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + geminiApiKey, {
+    // Updated API endpoint to use the Gemini API v1 instead of v1beta
+    const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=' + geminiApiKey, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -66,16 +67,20 @@ serve(async (req) => {
 
     const data = await response.json();
     
-    // Extract the generated text from Gemini's response format
+    // Updated to handle the response format of the v1 Gemini API
     let generatedText = "";
     try {
-      generatedText = data.candidates[0].content.parts[0].text;
+      // Extract the generated text from the v1 API response format
+      generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || 
+                      "I'm sorry, I couldn't process your request at this time.";
+      
+      console.log("Successfully generated response:", generatedText.substring(0, 100) + "...");
     } catch (e) {
       console.error("Error parsing Gemini response:", e);
-      console.error("Response data:", data);
+      console.error("Response data:", JSON.stringify(data, null, 2));
       
       if (data.error) {
-        throw new Error(`Gemini API Error: ${data.error.message}`);
+        throw new Error(`Gemini API Error: ${data.error.message || JSON.stringify(data.error)}`);
       }
       throw new Error("Unexpected response format from Gemini API");
     }
