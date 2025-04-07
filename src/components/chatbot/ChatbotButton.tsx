@@ -3,10 +3,10 @@ import React from 'react';
 import { Bot } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import ChatbotInterface from './ChatbotInterface';
-import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const ChatbotButton = () => {
-  const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
@@ -19,11 +19,15 @@ const ChatbotButton = () => {
               const button = document.querySelector('.animate-pulse-subtle');
               if (button) button.classList.remove('animate-pulse-subtle');
             }}
+            aria-label="Open health assistant chat"
           >
             <Bot size={24} />
           </button>
         </SheetTrigger>
-        <SheetContent className="sm:max-w-[400px] p-0 overflow-hidden">
+        <SheetContent 
+          className={`p-0 overflow-hidden ${isMobile ? 'w-[100vw] max-w-[100vw]' : 'sm:max-w-[400px]'}`} 
+          side={isMobile ? "bottom" : "right"}
+        >
           <ChatbotInterface />
         </SheetContent>
       </Sheet>

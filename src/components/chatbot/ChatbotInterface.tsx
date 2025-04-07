@@ -1,8 +1,10 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Message type
 type Message = {
@@ -16,7 +18,7 @@ type Message = {
 const initialMessages: Message[] = [
   {
     id: '1',
-    content: 'Hi there! I\'m your health assistant. How can I help you today?',
+    content: 'Hi there! I\'m MedAssist, your health assistant. How can I help you today?',
     role: 'bot',
     timestamp: new Date(),
   }
@@ -28,6 +30,17 @@ const ChatbotInterface = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
+  
+  // Auto-adjust textarea height
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+    }
+  }, [input]);
 
   // Scroll to bottom of messages
   useEffect(() => {
@@ -87,6 +100,10 @@ const ChatbotInterface = () => {
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      // Reset textarea height
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
     }
   };
 
@@ -98,27 +115,27 @@ const ChatbotInterface = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-2rem)]">
+    <div className="flex flex-col h-[calc(100vh-2rem)] sm:h-[600px]">
       {/* Header */}
-      <div className="p-4 border-b bg-health-primary text-white">
+      <div className="p-3 border-b bg-health-primary text-white">
         <div className="flex items-center">
-          <Bot className="mr-2" size={20} />
-          <h2 className="text-lg font-semibold">Health Assistant</h2>
+          <Bot className="mr-2" size={18} />
+          <h2 className="text-base font-semibold">MedAssist</h2>
         </div>
-        <p className="text-xs opacity-75 mt-1">Ask me anything about health, symptoms, or medications</p>
+        <p className="text-xs opacity-75 mt-1">Ask me about health concerns, symptoms, or medications</p>
       </div>
       
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50">
         {messages.map((msg) => (
           <div
             key={msg.id}
             className={`flex ${
               msg.role === 'user' ? 'justify-end' : 'justify-start'
-            }`}
+            } animate-fade-in`}
           >
             <div
-              className={`max-w-[80%] rounded-lg p-3 ${
+              className={`max-w-[85%] rounded-lg p-2.5 ${
                 msg.role === 'user'
                   ? 'bg-health-primary text-white rounded-tr-none'
                   : 'bg-white border border-gray-200 rounded-tl-none'
@@ -131,7 +148,7 @@ const ChatbotInterface = () => {
                   <User size={14} className="mr-1" />
                 )}
                 <span className="text-xs opacity-75">
-                  {msg.role === 'bot' ? 'Health Assistant' : 'You'}
+                  {msg.role === 'bot' ? 'MedAssist' : 'You'}
                 </span>
               </div>
               <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
@@ -147,19 +164,19 @@ const ChatbotInterface = () => {
           </div>
         ))}
         {isLoading && (
-          <div className="flex justify-start">
-            <div className="max-w-[80%] rounded-lg p-3 bg-white border border-gray-200 rounded-tl-none">
+          <div className="flex justify-start animate-fade-in">
+            <div className="max-w-[85%] rounded-lg p-2.5 bg-white border border-gray-200 rounded-tl-none">
               <div className="flex items-center">
                 <Bot size={14} className="mr-1 text-health-primary" />
-                <span className="text-xs opacity-75">Health Assistant</span>
+                <span className="text-xs opacity-75">MedAssist</span>
               </div>
-              <p className="text-sm">
-                <span className="inline-flex">
-                  <span className="animate-bounce">.</span>
-                  <span className="animate-bounce delay-100">.</span>
-                  <span className="animate-bounce delay-200">.</span>
-                </span>
-              </p>
+              <div className="h-6 flex items-center">
+                <div className="typing-indicator inline-flex">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -167,27 +184,29 @@ const ChatbotInterface = () => {
       </div>
       
       {/* Input */}
-      <div className="p-4 border-t">
+      <div className="p-3 border-t">
         <div className="flex">
           <textarea
+            ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder="Type your health query..."
+            placeholder="Type your health question..."
             className="flex-1 p-2 border rounded-l-md focus:outline-none focus:ring-1 focus:ring-health-primary resize-none"
             rows={1}
             disabled={isLoading}
+            style={{ maxHeight: '120px' }}
           />
           <Button
             onClick={handleSend}
             className={`rounded-l-none ${isLoading ? 'opacity-50' : ''}`}
             disabled={isLoading || !input.trim()}
           >
-            <Send size={18} />
+            <Send size={16} />
           </Button>
         </div>
         <p className="text-xs text-gray-500 mt-1">
-          Press Enter to send, Shift+Enter for a new line
+          {isMobile ? 'Need medical attention? Call emergency services.' : 'Press Enter to send, Shift+Enter for a new line. For emergencies, call medical services.'}
         </p>
       </div>
     </div>
