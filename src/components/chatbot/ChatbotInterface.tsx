@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 // Message type
 type Message = {
@@ -51,20 +52,14 @@ const ChatbotInterface = () => {
 
     try {
       // Call to your Supabase Edge Function that connects to Gemini API
-      const response = await fetch('https://YOUR_PROJECT_REF.supabase.co/functions/v1/gemini-health-chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt: input }),
+      const { data, error } = await supabase.functions.invoke('gemini-health-chat', {
+        body: { prompt: input }
       });
 
-      if (!response.ok) {
+      if (error) {
         throw new Error('Failed to get response from Gemini API');
       }
 
-      const data = await response.json();
-      
       // Add bot response
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
