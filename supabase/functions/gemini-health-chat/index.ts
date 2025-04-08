@@ -16,7 +16,17 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt } = await req.json();
+    const { prompt, previousMessages = [] } = await req.json();
+
+    // Create a context from previous messages
+    let contextText = "";
+    if (previousMessages.length > 0) {
+      contextText = "Previous conversation context:\n";
+      previousMessages.forEach((msg: { role: string; content: string }) => {
+        contextText += `${msg.role === 'bot' ? 'MedAssist' : 'User'}: ${msg.content}\n`;
+      });
+      contextText += "\nBased on this conversation context, please respond to the user's current message:\n";
+    }
 
     // Updated API endpoint to use the Gemini API v1 instead of v1beta
     const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=' + geminiApiKey, {
@@ -42,6 +52,8 @@ serve(async (req) => {
                 Be conversational and ask follow-up questions when appropriate to better understand the user's health concern.
                 
                 Your goal is to provide helpful information that gives users peace of mind while ensuring they understand the importance of professional medical care. Avoid saying phrases like "I cannot provide medical advice" - instead, provide information and emphasize the importance of consulting a doctor.
+                
+                ${contextText}
                 
                 User query: ${prompt}`
               }
