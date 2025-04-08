@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,17 +22,17 @@ type ChatbotInterfaceProps = {
 const initialMessages: Message[] = [
   {
     id: '1',
-    content: 'Hi there! I\'m MedAssist, your health assistant. I can help with health questions, suggest appropriate specialists, and provide general information about medications. How can I help you today?',
+    content: 'Hi there! I\'m MedAssist, your Indian healthcare assistant. I can help with health questions, suggest appropriate specialists in India, and provide information about medications available here. How can I help you today?',
     role: 'bot',
     timestamp: new Date(),
   }
 ];
 
-// Sample doctor suggestion examples
+// Updated India-specific suggested queries
 const suggestedQueries = [
-  "What symptoms indicate I should see a cardiologist?",
-  "Can you recommend over-the-counter options for headache?",
-  "What specialist should I see for joint pain?",
+  "What specialist should I see for joint pain in India?",
+  "Are Ayurvedic remedies effective for digestive issues?",
+  "Common symptoms of dengue fever?",
 ];
 
 const ChatbotInterface = ({ closeChat }: ChatbotInterfaceProps) => {
@@ -153,7 +152,7 @@ const ChatbotInterface = ({ closeChat }: ChatbotInterfaceProps) => {
             </button>
           )}
         </div>
-        <p className="text-xs opacity-75 mt-1">Ask me about health concerns, symptoms, or medications</p>
+        <p className="text-xs opacity-75 mt-1">Ask me about health concerns, symptoms, or medications available in India</p>
       </div>
       
       {/* Messages */}
@@ -255,7 +254,7 @@ const ChatbotInterface = ({ closeChat }: ChatbotInterfaceProps) => {
           </Button>
         </div>
         <p className="text-xs text-gray-500 mt-1">
-          {isMobile ? 'Press Enter to send. For emergencies, seek medical help.' : 'Press Enter to send, Shift+Enter for a new line. For emergencies, seek medical help.'}
+          {isMobile ? 'Press Enter to send. For emergencies call 102 or 108.' : 'Press Enter to send, Shift+Enter for a new line. For emergencies call 102 or 108.'}
         </p>
       </div>
     </div>
