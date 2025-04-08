@@ -1,16 +1,43 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import SignInDialog from '@/components/auth/SignInDialog';
 import SignUpDialog from '@/components/auth/SignUpDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const Welcome = () => {
   const [userType, setUserType] = useState<'patient' | 'doctor' | null>(null);
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [isSignUpOpen, setIsSignUpOpen] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  // Check for auth state changes, particularly important for OAuth redirects
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        toast({
+          title: "Successfully signed in",
+          description: "Welcome to HealthHub!",
+        });
+        navigate('/home');
+      }
+    });
+
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/home');
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [navigate, toast]);
 
   const handleRoleSelect = (role: 'patient' | 'doctor') => {
     setUserType(role);

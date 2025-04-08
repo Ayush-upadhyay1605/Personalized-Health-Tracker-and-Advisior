@@ -25,6 +25,11 @@ const Navbar = () => {
         
         if (event === 'SIGNED_IN') {
           console.log('User signed in:', session?.user?.email);
+          toast({
+            title: "Signed in successfully",
+            description: "Welcome to HealthHub!",
+          });
+          navigate('/home');
         }
         
         if (event === 'SIGNED_OUT') {
@@ -39,7 +44,7 @@ const Navbar = () => {
     });
     
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate, toast]);
 
   const handleSignOut = async () => {
     try {

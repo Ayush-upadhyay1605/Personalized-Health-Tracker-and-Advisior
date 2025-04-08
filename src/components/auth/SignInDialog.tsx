@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -27,6 +27,25 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp, userType = 'patient' }: S
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Listen for auth state changes to handle redirects after OAuth sign-ins
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        // Successfully signed in
+        toast({
+          title: "Successfully signed in",
+          description: "Welcome to HealthHub!",
+        });
+        onClose(); // Close the sign-in dialog
+        navigate('/home'); // Redirect to the home page
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [navigate, onClose, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +103,7 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp, userType = 'patient' }: S
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin,
+          redirectTo: `${window.location.origin}/home`,
         }
       });
 
