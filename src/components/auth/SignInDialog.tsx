@@ -100,13 +100,17 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp, userType = 'patient' }: S
     setIsGoogleLoading(true);
 
     try {
-      // Get the current origin for proper redirect
-      const origin = window.location.origin;
+      // Get the base URL for redirects - this must match what's configured in Google Cloud Console
+      const baseUrl = window.location.origin;
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${origin}/home`,
+          redirectTo: `${baseUrl}/home`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
         }
       });
 
@@ -115,7 +119,7 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp, userType = 'patient' }: S
       }
 
       // The user will be redirected to Google's authentication page
-      // Don't need to close the dialog here as the page will redirect
+      // No need to close the dialog here as the page will redirect
     } catch (error: any) {
       toast({
         title: "Google sign in failed",

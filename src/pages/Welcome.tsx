@@ -19,6 +19,7 @@ const Welcome = () => {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
+        console.log('Auth state change detected: SIGNED_IN');
         toast({
           title: "Successfully signed in",
           description: "Welcome to HealthHub!",
@@ -30,6 +31,7 @@ const Welcome = () => {
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
+        console.log('Existing session detected, redirecting to home');
         navigate('/home');
       }
     });
