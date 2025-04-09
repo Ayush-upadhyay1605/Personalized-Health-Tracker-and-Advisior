@@ -29,11 +29,15 @@ const Navbar = () => {
             title: "Signed in successfully",
             description: "Welcome to HealthHub!",
           });
-          navigate('/home');
+          // Use window.location.href for a full page refresh to ensure all auth state is properly updated
+          if (window.location.pathname === '/') {
+            navigate('/home');
+          }
         }
         
         if (event === 'SIGNED_OUT') {
           console.log('User signed out');
+          navigate('/');
         }
       }
     );
@@ -41,6 +45,11 @@ const Navbar = () => {
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      
+      // If user is logged in but on the root page, redirect to home
+      if (session?.user && window.location.pathname === '/') {
+        navigate('/home');
+      }
     });
     
     return () => subscription.unsubscribe();

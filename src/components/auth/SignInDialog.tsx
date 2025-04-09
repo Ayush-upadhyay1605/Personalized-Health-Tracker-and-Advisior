@@ -100,10 +100,13 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp, userType = 'patient' }: S
     setIsGoogleLoading(true);
 
     try {
+      // Get the current origin for proper redirect
+      const origin = window.location.origin;
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/home`,
+          redirectTo: `${origin}/home`,
         }
       });
 
