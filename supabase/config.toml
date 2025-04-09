@@ -42,7 +42,7 @@ file_size_limit = "50MiB"
 [auth]
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "http://localhost:3000"
+site_url = "https://personalized-health-tracker-and-advisior.vercel.app"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = [
   "https://localhost:3000", 
@@ -87,7 +87,7 @@ enabled = true
 client_id = ""
 secret = ""
 # Overrides the default auth redirectUrl.
-redirect_uri = ""
+redirect_uri = "https://personalized-health-tracker-and-advisior.vercel.app/auth/callback"
 # Overrides the default auth provider URL. Used to support self-hosted gitlab, single-tenant Azure,
 # or any other third-party OIDC providers.
 url = ""
