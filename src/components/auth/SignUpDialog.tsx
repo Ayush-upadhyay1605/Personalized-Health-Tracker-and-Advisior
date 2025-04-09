@@ -117,7 +117,7 @@ const SignUpDialog = ({ isOpen, onClose, onOpenSignIn, userType = 'patient' }: S
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${baseUrl}/home`,
+          redirectTo: `${baseUrl}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',

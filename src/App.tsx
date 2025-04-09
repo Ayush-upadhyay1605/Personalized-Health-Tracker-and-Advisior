@@ -18,6 +18,7 @@ import Settings from "./pages/Settings";
 import DashboardLayout from "./components/DashboardLayout";
 import Welcome from "./pages/Welcome";
 import { DoctorSearchProvider } from "./components/DoctorSearchContext";
+import AuthCallback from "./pages/AuthCallback"; // Import the new AuthCallback component
 import './App.css'; // Ensure CSS is imported
 
 // Create a new QueryClient instance outside of component render
@@ -42,6 +43,9 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Welcome />} />
                 <Route path="/home" element={<Index />} />
+                
+                {/* Auth Callback Route */}
+                <Route path="/auth/callback" element={<AuthCallback />} />
                 
                 {/* Doctor Search and Booking Routes */}
                 <Route path="/doctor-search" element={<DoctorSearch />} />
