@@ -11,7 +11,7 @@ export const additionalDoctors = [
     reviews: 118,
     fee: '₹1200',
     availableToday: true,
-    image: 'https://img.freepik.com/premium-vector/doctor-portrait-flat-design_23-2149443862.jpg',
+    image: 'https://images.unsplash.com/photo-1622902046580-2b47f47f5471?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 12.9716, lng: 77.5946 } // Bangalore
   },
   {
@@ -24,7 +24,7 @@ export const additionalDoctors = [
     reviews: 92,
     fee: '₹1000',
     availableToday: false,
-    image: 'https://img.freepik.com/premium-vector/female-doctor-cartoon-character_24908-61247.jpg',
+    image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 13.0827, lng: 80.2707 } // Chennai
   },
   {
@@ -37,7 +37,7 @@ export const additionalDoctors = [
     reviews: 231,
     fee: '₹1500',
     availableToday: true,
-    image: 'https://img.freepik.com/premium-vector/cartoon-male-doctor-holding-clipboard_353337-393.jpg',
+    image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 17.3850, lng: 78.4867 } // Hyderabad
   },
   {
@@ -50,7 +50,7 @@ export const additionalDoctors = [
     reviews: 104,
     fee: '₹1200',
     availableToday: false,
-    image: 'https://img.freepik.com/premium-vector/female-doctor-with-stethoscope-cartoon-character_24908-61230.jpg',
+    image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 22.5726, lng: 88.3639 } // Kolkata
   },
   {
@@ -63,7 +63,7 @@ export const additionalDoctors = [
     reviews: 138,
     fee: '₹1300',
     availableToday: true,
-    image: 'https://img.freepik.com/premium-vector/handsome-young-doctor-presenting-something_353337-408.jpg',
+    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 18.5204, lng: 73.8567 } // Pune
   },
   {
@@ -76,7 +76,7 @@ export const additionalDoctors = [
     reviews: 87,
     fee: '₹1100',
     availableToday: true,
-    image: 'https://img.freepik.com/premium-vector/asian-female-doctor-with-glasses-stethoscope-cartoon-vector_40876-3129.jpg',
+    image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 23.0225, lng: 72.5714 } // Ahmedabad
   },
   {
@@ -89,7 +89,7 @@ export const additionalDoctors = [
     reviews: 189,
     fee: '₹1000',
     availableToday: false,
-    image: 'https://img.freepik.com/premium-vector/professional-doctor-illustration_23-2148278832.jpg',
+    image: 'https://images.unsplash.com/photo-1622902046580-2b47f47f5471?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 26.9124, lng: 75.7873 } // Jaipur
   },
   {
@@ -102,7 +102,7 @@ export const additionalDoctors = [
     reviews: 152,
     fee: '₹900',
     availableToday: true,
-    image: 'https://img.freepik.com/premium-vector/female-doctor-cartoon-character-hospital-staff_24908-33544.jpg',
+    image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 26.8467, lng: 80.9462 } // Lucknow
   },
   {
@@ -115,7 +115,7 @@ export const additionalDoctors = [
     reviews: 76,
     fee: '₹950',
     availableToday: false,
-    image: 'https://img.freepik.com/premium-vector/young-doctor-illustration_23-2148377198.jpg',
+    image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 23.2599, lng: 77.4126 } // Bhopal
   },
   {
@@ -128,7 +128,7 @@ export const additionalDoctors = [
     reviews: 124,
     fee: '₹1100',
     availableToday: true,
-    image: 'https://img.freepik.com/premium-vector/female-doctor-with-clipboard-vector-illustration_118813-17201.jpg',
+    image: 'https://images.unsplash.com/photo-1594824476811-b90baee60c1f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     coordinates: { lat: 30.7333, lng: 76.7794 } // Chandigarh
   }
 ];
