@@ -103,6 +103,7 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp, userType = 'patient' }: S
       // Get the base URL for redirects - this must match what's configured in Google Cloud Console
       const baseUrl = window.location.origin;
       
+      // Force the redirectTo to be the auth callback page with all params necessary
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {

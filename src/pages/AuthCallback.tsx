@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -7,16 +7,25 @@ import { useToast } from '@/hooks/use-toast';
 const AuthCallback = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isProcessing, setIsProcessing] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // This component will handle the auth callback from OAuth providers
     const handleAuthCallback = async () => {
       try {
-        // Check for auth state
-        const { data: { session }, error } = await supabase.auth.getSession();
+        setIsProcessing(true);
         
-        if (error) {
-          throw error;
+        // Extract hash or query parameters if needed
+        const hashParams = window.location.hash 
+          ? new URLSearchParams(window.location.hash.substring(1))
+          : null;
+          
+        // Check for auth state
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          throw sessionError;
         }
 
         if (session) {
@@ -25,24 +34,57 @@ const AuthCallback = () => {
             title: "Successfully signed in",
             description: "Welcome to HealthHub!",
           });
+          setIsProcessing(false);
           navigate('/home');
         } else {
-          console.log("No session found in callback, redirecting to welcome page");
+          console.log("No session found in callback, checking for error parameters");
+          
+          // Check if there are error parameters in the URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const errorParam = urlParams.get('error');
+          const errorDescriptionParam = urlParams.get('error_description');
+          
+          if (errorParam) {
+            throw new Error(errorDescriptionParam || errorParam);
+          }
+          
+          console.log("No session or error found, redirecting to welcome page");
+          setIsProcessing(false);
           navigate('/');
         }
       } catch (error: any) {
         console.error("Error in auth callback:", error);
+        setError(error.message || "There was a problem with your authentication");
         toast({
           title: "Authentication error",
           description: error.message || "There was a problem with your authentication",
           variant: "destructive",
         });
+        setIsProcessing(false);
         navigate('/');
       }
     };
 
     handleAuthCallback();
   }, [navigate, toast]);
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-health-light">
+        <div className="text-center">
+          <div className="text-red-500 text-5xl mb-4">⚠️</div>
+          <h2 className="text-xl font-medium text-gray-700">Authentication Error</h2>
+          <p className="mt-2 text-gray-500">{error}</p>
+          <button 
+            onClick={() => navigate('/')} 
+            className="mt-4 bg-health-primary text-white px-4 py-2 rounded"
+          >
+            Return to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-health-light">
