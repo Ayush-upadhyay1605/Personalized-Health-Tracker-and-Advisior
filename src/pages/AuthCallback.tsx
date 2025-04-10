@@ -15,29 +15,49 @@ const AuthCallback = () => {
     const handleAuthCallback = async () => {
       try {
         setIsProcessing(true);
+        console.log("Auth callback page loaded, processing authentication...");
         
-        // Extract hash or query parameters if needed
-        const hashParams = window.location.hash 
-          ? new URLSearchParams(window.location.hash.substring(1))
-          : null;
+        // Check if there's a hash fragment in the URL (common for OAuth redirects)
+        const hashFragment = window.location.hash;
+        console.log("Hash fragment present:", hashFragment ? "Yes" : "No");
+        
+        if (hashFragment && hashFragment.includes('access_token')) {
+          console.log("Access token found in hash fragment, setting session from URL");
+          // The hash contains auth info, we need to let Supabase process it
+          // This will automatically set the session
+          const { data, error: setSessionError } = await supabase.auth.setSession({
+            access_token: new URLSearchParams(hashFragment.substring(1)).get('access_token') || '',
+            refresh_token: new URLSearchParams(hashFragment.substring(1)).get('refresh_token') || '',
+          });
           
-        // Check for auth state
+          if (setSessionError) {
+            console.error("Error setting session from URL params:", setSessionError);
+            throw setSessionError;
+          }
+          
+          if (data.session) {
+            console.log("Session successfully set from URL params");
+          }
+        }
+        
+        // Now check if we have a valid session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
+          console.error("Error getting session:", sessionError);
           throw sessionError;
         }
 
         if (session) {
-          console.log("Authentication successful in callback, redirecting to home");
+          console.log("Authentication successful, redirecting to home");
           toast({
             title: "Successfully signed in",
-            description: "Welcome to HealthHub!",
+            description: `Welcome to HealthHub, ${session.user.user_metadata.full_name || ''}!`,
           });
           setIsProcessing(false);
           navigate('/home');
         } else {
-          console.log("No session found in callback, checking for error parameters");
+          console.log("No session found, checking for error parameters");
           
           // Check if there are error parameters in the URL
           const urlParams = new URLSearchParams(window.location.search);
@@ -45,6 +65,7 @@ const AuthCallback = () => {
           const errorDescriptionParam = urlParams.get('error_description');
           
           if (errorParam) {
+            console.error("Error parameter found in URL:", errorParam, errorDescriptionParam);
             throw new Error(errorDescriptionParam || errorParam);
           }
           
