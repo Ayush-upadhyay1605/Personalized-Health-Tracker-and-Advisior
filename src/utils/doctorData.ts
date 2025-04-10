@@ -11,7 +11,7 @@ export const additionalDoctors = [
     reviews: 118,
     fee: '₹1200',
     availableToday: true,
-    image: 'https://img.freepik.com/premium-vector/doctor-character-design_8163-412.jpg',
+    image: 'https://img.freepik.com/premium-vector/doctor-portrait-flat-design_23-2149443862.jpg',
     coordinates: { lat: 12.9716, lng: 77.5946 } // Bangalore
   },
   {
@@ -37,7 +37,7 @@ export const additionalDoctors = [
     reviews: 231,
     fee: '₹1500',
     availableToday: true,
-    image: 'https://img.freepik.com/premium-vector/cartoon-doctor-holding-clipboard_29190-4754.jpg',
+    image: 'https://img.freepik.com/premium-vector/cartoon-male-doctor-holding-clipboard_353337-393.jpg',
     coordinates: { lat: 17.3850, lng: 78.4867 } // Hyderabad
   },
   {
@@ -63,7 +63,7 @@ export const additionalDoctors = [
     reviews: 138,
     fee: '₹1300',
     availableToday: true,
-    image: 'https://img.freepik.com/premium-vector/cartoon-doctor-with-glasses-stethoscope_29190-5238.jpg',
+    image: 'https://img.freepik.com/premium-vector/handsome-young-doctor-presenting-something_353337-408.jpg',
     coordinates: { lat: 18.5204, lng: 73.8567 } // Pune
   },
   {
@@ -76,7 +76,7 @@ export const additionalDoctors = [
     reviews: 87,
     fee: '₹1100',
     availableToday: true,
-    image: 'https://img.freepik.com/premium-vector/female-doctor-cartoon-illustration_24908-54662.jpg',
+    image: 'https://img.freepik.com/premium-vector/asian-female-doctor-with-glasses-stethoscope-cartoon-vector_40876-3129.jpg',
     coordinates: { lat: 23.0225, lng: 72.5714 } // Ahmedabad
   },
   {
@@ -89,7 +89,7 @@ export const additionalDoctors = [
     reviews: 189,
     fee: '₹1000',
     availableToday: false,
-    image: 'https://img.freepik.com/premium-vector/doctor-cartoon-character-medical-staff_24640-65186.jpg',
+    image: 'https://img.freepik.com/premium-vector/professional-doctor-illustration_23-2148278832.jpg',
     coordinates: { lat: 26.9124, lng: 75.7873 } // Jaipur
   },
   {
@@ -115,7 +115,7 @@ export const additionalDoctors = [
     reviews: 76,
     fee: '₹950',
     availableToday: false,
-    image: 'https://img.freepik.com/premium-vector/smiling-young-male-doctor-holding-clipboard-cartoon-character_40876-1839.jpg',
+    image: 'https://img.freepik.com/premium-vector/young-doctor-illustration_23-2148377198.jpg',
     coordinates: { lat: 23.2599, lng: 77.4126 } // Bhopal
   },
   {
@@ -128,7 +128,7 @@ export const additionalDoctors = [
     reviews: 124,
     fee: '₹1100',
     availableToday: true,
-    image: 'https://img.freepik.com/premium-vector/cute-female-doctor-character-with-clipboard-cartoon-vector-illustration_40876-3129.jpg',
+    image: 'https://img.freepik.com/premium-vector/female-doctor-with-clipboard-vector-illustration_118813-17201.jpg',
     coordinates: { lat: 30.7333, lng: 76.7794 } // Chandigarh
   }
 ];
