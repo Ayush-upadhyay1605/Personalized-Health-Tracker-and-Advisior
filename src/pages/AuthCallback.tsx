@@ -23,8 +23,8 @@ const AuthCallback = () => {
         
         if (hashFragment && hashFragment.includes('access_token')) {
           console.log("Access token found in hash fragment, setting session from URL");
+          
           // The hash contains auth info, we need to let Supabase process it
-          // This will automatically set the session
           const { data, error: setSessionError } = await supabase.auth.setSession({
             access_token: new URLSearchParams(hashFragment.substring(1)).get('access_token') || '',
             refresh_token: new URLSearchParams(hashFragment.substring(1)).get('refresh_token') || '',
@@ -37,6 +37,29 @@ const AuthCallback = () => {
           
           if (data.session) {
             console.log("Session successfully set from URL params");
+            
+            // Now that we have a valid session, create or update user in MongoDB
+            try {
+              const { data: userResponse, error: userError } = await supabase.functions.invoke('create-mongodb-user', {
+                body: {
+                  userId: data.session.user.id,
+                  email: data.session.user.email,
+                  fullName: data.session.user.user_metadata.full_name || '',
+                  avatarUrl: data.session.user.user_metadata.avatar_url || '',
+                  provider: 'google'
+                }
+              });
+              
+              if (userError) {
+                console.error("Error creating MongoDB user:", userError);
+                // Don't throw here, we still want to proceed with the login
+              } else {
+                console.log("MongoDB user created/updated successfully:", userResponse);
+              }
+            } catch (mongoError) {
+              console.error("Exception when creating MongoDB user:", mongoError);
+              // Don't throw here, we still want to proceed with the login
+            }
           }
         }
         

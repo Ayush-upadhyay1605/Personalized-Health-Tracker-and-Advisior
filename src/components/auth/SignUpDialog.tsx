@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -30,17 +29,15 @@ const SignUpDialog = ({ isOpen, onClose, onOpenSignIn, userType = 'patient' }: S
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Listen for auth state changes to handle redirects after OAuth sign-ups
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        // Successfully signed in/up
         toast({
           title: "Account created successfully",
           description: "Welcome to HealthHub!",
         });
-        onClose(); // Close the sign-up dialog
-        navigate('/home'); // Redirect to the home page
+        onClose();
+        navigate('/home');
       }
     });
 
@@ -83,7 +80,6 @@ const SignUpDialog = ({ isOpen, onClose, onOpenSignIn, userType = 'patient' }: S
       if (userType === 'patient') {
         navigate("/home");
       } else {
-        // For doctors, we might want a different dashboard
         navigate("/dashboard");
       }
     } catch (error: any) {
@@ -111,8 +107,9 @@ const SignUpDialog = ({ isOpen, onClose, onOpenSignIn, userType = 'patient' }: S
     setIsGoogleLoading(true);
 
     try {
-      // Get the base URL for redirects - this must match what's configured in Google Cloud Console
       const baseUrl = window.location.origin;
+      
+      console.log("Starting Google sign-up, will redirect to:", `${baseUrl}/auth/callback`);
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -129,7 +126,6 @@ const SignUpDialog = ({ isOpen, onClose, onOpenSignIn, userType = 'patient' }: S
         throw error;
       }
 
-      // The user will be redirected to Google's authentication page
     } catch (error: any) {
       toast({
         title: "Google sign up failed",

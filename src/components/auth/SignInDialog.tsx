@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -28,17 +27,15 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp, userType = 'patient' }: S
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Listen for auth state changes to handle redirects after OAuth sign-ins
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        // Successfully signed in
         toast({
           title: "Successfully signed in",
           description: "Welcome to HealthHub!",
         });
-        onClose(); // Close the sign-in dialog
-        navigate('/home'); // Redirect to the home page
+        onClose();
+        navigate('/home');
       }
     });
 
@@ -68,11 +65,9 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp, userType = 'patient' }: S
       
       onClose();
       
-      // Redirect based on user type
       if (userType === 'patient') {
         navigate("/home");
       } else {
-        // For doctors, we might want a different dashboard
         navigate("/dashboard");
       }
     } catch (error: any) {
@@ -100,10 +95,10 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp, userType = 'patient' }: S
     setIsGoogleLoading(true);
 
     try {
-      // Get the base URL for redirects - this must match what's configured in Google Cloud Console
       const baseUrl = window.location.origin;
       
-      // Force the redirectTo to be the auth callback page with all params necessary
+      console.log("Starting Google sign-in, will redirect to:", `${baseUrl}/auth/callback`);
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -118,9 +113,6 @@ const SignInDialog = ({ isOpen, onClose, onOpenSignUp, userType = 'patient' }: S
       if (error) {
         throw error;
       }
-
-      // The user will be redirected to Google's authentication page
-      // No need to close the dialog here as the page will redirect
     } catch (error: any) {
       toast({
         title: "Google sign in failed",
